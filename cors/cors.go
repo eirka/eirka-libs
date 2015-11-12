@@ -13,12 +13,13 @@ var (
 	validSites          = map[string]bool{}
 	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
 	defaultAllowMethods = []string{"POST", "DELETE"}
+	Domains             []string
 )
 
 func init() {
 
 	// add valid sites to map
-	for _, site := range config.Settings.CORS.Sites {
+	for _, site := range Domains {
 		validSites[site] = true
 	}
 
