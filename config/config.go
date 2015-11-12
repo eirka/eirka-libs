@@ -81,6 +81,7 @@ type Config struct {
 
 func Print() {
 
+	fmt.Println(strings.Repeat("*", 60))
 	fmt.Printf("%-20v\n\n", "Global Settings")
 	fmt.Println(strings.Repeat("*", 60))
 	fmt.Printf("%-20v\n\n", "General")
