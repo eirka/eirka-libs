@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/techjanitor/pram-libs/config"
 )
 
 var (
