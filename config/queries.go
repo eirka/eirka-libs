@@ -132,6 +132,56 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
+	err = ps.QueryRow("akismet_key").Scan(&config.Settings.Akismet.Key)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("akismet_host").Scan(&config.Settings.Akismet.Host)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("sfs_confidence").Scan(&config.Settings.StopForumSpam.Confidence)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("amazon_region").Scan(&config.Settings.Amazon.Region)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("amazon_bucket").Scan(&config.Settings.Amazon.Bucket)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("amazon_id").Scan(&config.Settings.Amazon.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("amazon_key").Scan(&config.Settings.Amazon.Key)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("google_auth").Scan(&config.Settings.Google.Auth)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("google_bucket").Scan(&config.Settings.Google.Bucket)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("google_key").Scan(&config.Settings.Google.Key)
+	if err != nil {
+		panic(err)
+	}
+
 	return
 
 }
