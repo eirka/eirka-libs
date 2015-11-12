@@ -81,6 +81,8 @@ type Config struct {
 
 func Print() {
 	fmt.Println(strings.Repeat("*", 60))
+	fmt.Printf("%-20v\n\n", "Global Settings")
+	fmt.Println(strings.Repeat("*", 60))
 	fmt.Printf("%-20v\n\n", "General")
 	fmt.Printf("%-20v%40v\n", "Guest Posting", Settings.General.GuestPosting)
 	fmt.Printf("%-20v%40v\n", "Auto Registration", Settings.General.AutoRegistration)
@@ -129,7 +131,7 @@ func Print() {
 	fmt.Printf("%-20v%40v\n", "Auth", Settings.Google.Auth)
 	fmt.Printf("%-20v%40v\n", "Bucket", Settings.Google.Bucket)
 	fmt.Printf("%-20v%40v\n", "Key", Settings.Google.Key)
-
+	fmt.Println(strings.Repeat("*", 60))
 }
 
 func init() {
