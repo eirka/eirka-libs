@@ -1,6 +1,7 @@
 package cors
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -10,7 +11,7 @@ import (
 var (
 	validSites          = map[string]bool{}
 	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
-	defaultAllowMethods = []string{"POST", "DELETE"}
+	defaultAllowMethods []string
 )
 
 // CORS will set the headers for Cross-origin resource sharing
@@ -50,11 +51,20 @@ func CORS() gin.HandlerFunc {
 	}
 }
 
-func SetDomains(domains []string) {
+func SetDomains(domains, methods []string) {
 	// add valid sites to map
 	for _, site := range domains {
 		validSites[site] = true
 	}
+
+	// set methods
+	defaultAllowMethods = methods
+
+	fmt.Println(strings.Repeat("*", 60))
+	fmt.Printf("%-20v\n\n", "CORS")
+	fmt.Printf("%-20v%40v\n", "Domains", strings.Join(domains, ", "))
+	fmt.Printf("%-20v%40v\n", "Methods", strings.Join(defaultAllowMethods, ", "))
+	fmt.Println(strings.Repeat("*", 60))
 
 	return
 }
