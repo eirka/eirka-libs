@@ -55,6 +55,8 @@ func SetDomains(domains []string) {
 	for _, site := range domains {
 		validSites[site] = true
 	}
+
+	return
 }
 
 // Check if origin is allowed
