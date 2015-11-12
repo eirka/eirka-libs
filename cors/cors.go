@@ -11,17 +11,7 @@ var (
 	validSites          = map[string]bool{}
 	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
 	defaultAllowMethods = []string{"POST", "DELETE"}
-	Domains             []string
 )
-
-func init() {
-
-	// add valid sites to map
-	for _, site := range Domains {
-		validSites[site] = true
-	}
-
-}
 
 // CORS will set the headers for Cross-origin resource sharing
 func CORS() gin.HandlerFunc {
@@ -57,6 +47,13 @@ func CORS() gin.HandlerFunc {
 
 		}
 
+	}
+}
+
+func SetDomains(domains []string) {
+	// add valid sites to map
+	for _, site := range domains {
+		validSites[site] = true
 	}
 }
 
