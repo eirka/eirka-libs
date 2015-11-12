@@ -82,7 +82,7 @@ type Config struct {
 func Print() {
 
 	fmt.Println(strings.Repeat("*", 60))
-	fmt.Printf("%-20v\n\n", "Global Settings")
+	fmt.Printf("%-20v\n", "Global Settings")
 	fmt.Println(strings.Repeat("*", 60))
 	fmt.Printf("%-20v\n\n", "General")
 	fmt.Printf("%-20v%40v\n", "Guest Posting", Settings.General.GuestPosting)
