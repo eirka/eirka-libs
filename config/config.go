@@ -25,6 +25,21 @@ type Config struct {
 		Confidence float64
 	}
 
+	// settings for amazon s3
+	Amazon struct {
+		Region string
+		Bucket string
+		Id     string
+		Key    string
+	}
+
+	// settings for google storage
+	Google struct {
+		Auth   string
+		Bucket string
+		Key    string
+	}
+
 	Antispam struct {
 		// Antispam Key from Prim
 		AntispamKey string
