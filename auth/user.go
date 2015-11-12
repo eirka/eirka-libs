@@ -2,7 +2,6 @@ package auth
 
 import (
 	"database/sql"
-	"errors"
 
 	"github.com/techjanitor/pram-libs/db"
 	e "github.com/techjanitor/pram-libs/errors"

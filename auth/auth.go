@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 
-	"github.com/techjanitor/pram-libs/config"
 	e "github.com/techjanitor/pram-libs/errors"
 )
 
@@ -18,6 +17,8 @@ const (
 	Moderators
 	Admins
 )
+
+var Secret string
 
 // checks for session cookie and handles permissions
 func Auth(perm Permission) gin.HandlerFunc {
@@ -40,7 +41,7 @@ func Auth(perm Permission) gin.HandlerFunc {
 			}
 
 			// compare with secret from settings
-			return []byte(config.Settings.Session.Secret), nil
+			return []byte(Secret), nil
 		})
 		if err != nil && err != jwt.ErrNoTokenInRequest {
 			// if theres some jwt error then return unauth
