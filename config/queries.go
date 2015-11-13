@@ -182,17 +182,17 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
-	err = ps.QueryRow("thread_postsperpage").Scan(&config.Settings.Limits.PostsPerPage)
+	err = ps.QueryRow("thread_postsperpage").Scan(&Settings.Limits.PostsPerPage)
 	if err != nil {
 		panic(err)
 	}
 
-	err = ps.QueryRow("index_threadsperpage").Scan(&config.Settings.Limits.ThreadsPerPage)
+	err = ps.QueryRow("index_threadsperpage").Scan(&Settings.Limits.ThreadsPerPage)
 	if err != nil {
 		panic(err)
 	}
 
-	err = ps.QueryRow("index_postsperthread").Scan(&config.Settings.Limits.PostsPerThread)
+	err = ps.QueryRow("index_postsperthread").Scan(&Settings.Limits.PostsPerThread)
 	if err != nil {
 		panic(err)
 	}
