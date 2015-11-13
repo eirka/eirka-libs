@@ -127,3 +127,30 @@ func (c *RedisStore) Flush() (err error) {
 
 	return
 }
+
+// will increment a redis key
+func (c *RedisStore) Incr(key string) (result int, err error) {
+	conn := c.pool.Get()
+	defer conn.Close()
+
+	raw, err := conn.Do("INCR", key)
+	if raw == nil {
+		return 0, ErrCacheMiss
+	}
+	result, err = redis.Int(raw, err)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// will set expire on a redis key
+func (c *RedisStore) Expire(key string, timeout uint) (err error) {
+	conn := c.pool.Get()
+	defer conn.Close()
+
+	_, err = conn.Do("EXPIRE", key, timeout)
+
+	return
+}
