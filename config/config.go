@@ -75,6 +75,13 @@ type Config struct {
 		ThumbnailMaxWidth  int
 		ThumbnailMaxHeight int
 
+		// Set default posts per page
+		PostsPerPage uint
+		// Set default threads per index page
+		ThreadsPerPage uint
+		// Add one to number because first post is included
+		PostsPerThread uint
+
 		// Max request parameter input size
 		ParamMaxSize uint
 	}
