@@ -1,0 +1,27 @@
+package audit
+
+var (
+	AuditNewThread       = "Thread Created"
+	AuditReply           = "Replied"
+	AuditNewTag          = "Tag Created"
+	AuditAddTag          = "Tag Added"
+	AuditCloseThread     = "Thread Closed"
+	AuditOpenThread      = "Thread Opened"
+	AuditStickyThread    = "Thread Stickied"
+	AuditUnstickyThread  = "Thread Unstickied"
+	AuditDeletePost      = "Post Deleted"
+	AuditDeleteThread    = "Thread Deleted"
+	AuditPurgePost       = "Post Purged"
+	AuditPurgeThread     = "Thread Purged"
+	AuditDeleteTag       = "Tag Deleted"
+	AuditDeleteImageTag  = "Image Tag Deleted"
+	AuditPurge           = "Deleted Items Purged"
+	AuditFlushCache      = "Cache Flushed"
+	AuditBanIp           = "IP Banned"
+	AuditBanImage        = "Image Banned"
+	AuditRegister        = "Account Registered"
+	AuditChangePassword  = "Password Changed"
+	AuditEmailUpdate     = "Email Updated"
+	AuditFavoriteRemoved = "Favorite Removed"
+	AuditFavoriteAdded   = "Favorite Added"
+)
