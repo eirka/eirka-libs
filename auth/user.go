@@ -13,6 +13,7 @@ type User struct {
 	Name            string `json:"name"`
 	Email           string `json:"email"`
 	Group           uint   `json:"group"`
+	Avatar          string `json:"avatar"`
 	IsModerator     bool   `json:"moderator"`
 	IsAdmin         bool   `json:"admin"`
 	IsAuthenticated bool   `json:"-"`
@@ -36,10 +37,10 @@ func (u *User) Info() (err error) {
 	}
 
 	// get data from users table
-	err = dbase.QueryRow(`SELECT user_group_map.usergroup_id,user_name,user_email,user_confirmed,user_locked,user_banned 
+	err = dbase.QueryRow(`SELECT user_group_map.usergroup_id,user_name,user_email,user_confirmed,user_locked,user_banned,user_avatar
     FROM users
     INNER JOIN user_group_map ON user_group_map.user_id = users.user_id
-    WHERE users.user_id = ?`, u.Id).Scan(&u.Group, &u.Name, &u.Email, &u.IsConfirmed, &u.IsLocked, &u.IsBanned)
+    WHERE users.user_id = ?`, u.Id).Scan(&u.Group, &u.Name, &u.Email, &u.IsConfirmed, &u.IsLocked, &u.IsBanned, &u.Avatar)
 	if err == sql.ErrNoRows {
 		return e.ErrUserNotExist
 	} else if err != nil {
