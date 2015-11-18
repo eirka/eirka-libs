@@ -29,6 +29,8 @@ func Auth(perm Permission) gin.HandlerFunc {
 			Id:              1,
 			Group:           uint(All),
 			IsAuthenticated: false,
+			IsModerator:     false,
+			IsAdmin:         false,
 		}
 
 		// parse jwt token if its there
