@@ -10,7 +10,7 @@ import (
 
 var (
 	validSites          = map[string]bool{}
-	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
+	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization", "ib_id"}
 	defaultAllowMethods []string
 )
 
