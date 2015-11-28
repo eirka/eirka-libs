@@ -71,7 +71,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 				}
 
 				// cast to uint
-				uid = uint(jwt_uid)
+				uid := uint(jwt_uid)
 
 				// these are invalid uids
 				if uid == 0 || uid == 1 {
