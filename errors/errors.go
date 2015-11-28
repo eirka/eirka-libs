@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	ErrInvalidParam  = &RequestError{ErrorString: "Invalid Parameter", ErrorCode: http.StatusBadRequest}
+	ErrInvalidParam  = &RequestError{ErrorString: "Bad Request", ErrorCode: http.StatusBadRequest}
 	ErrInternalError = &RequestError{ErrorString: "Internal Error", ErrorCode: http.StatusInternalServerError}
 	ErrNotFound      = &RequestError{ErrorString: "Request Not Found", ErrorCode: http.StatusNotFound}
 	ErrUnauthorized  = &RequestError{ErrorString: "Unauthorized", ErrorCode: http.StatusUnauthorized}
+	ErrForbidden     = &RequestError{ErrorString: "Forbidden", ErrorCode: http.StatusForbidden}
 
 	ErrNoIb             error = errors.New("Imageboard id required")
 	ErrNoThread         error = errors.New("Thread id required")
@@ -54,6 +55,7 @@ var (
 	ErrUserBanned       error = errors.New("Account banned")
 	ErrUserLocked       error = errors.New("Account locked")
 	ErrUserNotExist     error = errors.New("User does not exist")
+	ErrNoSecret         error = errors.New("No secret key was set")
 )
 
 type RequestError struct {

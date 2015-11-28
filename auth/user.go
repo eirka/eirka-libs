@@ -11,11 +11,6 @@ import (
 type User struct {
 	Id              uint   `json:"id"`
 	Name            string `json:"name"`
-	Email           string `json:"email"`
-	Group           uint   `json:"group"`
-	Avatar          string `json:"avatar"`
-	IsModerator     bool   `json:"moderator"`
-	IsAdmin         bool   `json:"admin"`
 	IsAuthenticated bool   `json:"-"`
 	IsConfirmed     bool   `json:"-"`
 	IsLocked        bool   `json:"-"`
@@ -37,10 +32,9 @@ func (u *User) Info() (err error) {
 	}
 
 	// get data from users table
-	err = dbase.QueryRow(`SELECT role_id,user_name,user_email,user_confirmed,user_locked,user_banned,user_avatar
+	err = dbase.QueryRow(`SELECT user_name,user_confirmed,user_locked,user_banned
     FROM users
-    INNER JOIN user_role_map ON user_role_map.user_id = users.user_id
-    WHERE users.user_id = ?`, u.Id).Scan(&u.Group, &u.Name, &u.Email, &u.IsConfirmed, &u.IsLocked, &u.IsBanned, &u.Avatar)
+    WHERE users.user_id = ?`, u.Id).Scan(&u.Name, &u.IsConfirmed, &u.IsLocked, &u.IsBanned)
 	if err == sql.ErrNoRows {
 		return e.ErrUserNotExist
 	} else if err != nil {

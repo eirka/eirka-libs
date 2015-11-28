@@ -9,28 +9,25 @@ import (
 	e "github.com/techjanitor/pram-libs/errors"
 )
 
-type Permission uint
-
-const (
-	All Permission = 1 + iota
-	Registered
-	Moderators
-	Admins
-)
-
+// holds the hmac secret, is set from main
 var Secret string
 
 // checks for session cookie and handles permissions
-func Auth(perm Permission) gin.HandlerFunc {
+func Auth(authenticated bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		// error if theres no secret set
+		if Secret == "" {
+			c.JSON(e.ErrorMessage(e.ErrInternalError))
+			c.Error(e.ErrInternalError)
+			c.Abort(e.ErrNoSecret)
+			return
+		}
 
 		// set default anonymous user
 		user := User{
 			Id:              1,
-			Group:           uint(All),
 			IsAuthenticated: false,
-			IsModerator:     false,
-			IsAdmin:         false,
 		}
 
 		// parse jwt token if its there
@@ -55,6 +52,7 @@ func Auth(perm Permission) gin.HandlerFunc {
 
 		// process token
 		if token != nil {
+
 			// if the token is valid set the data
 			if err == nil && token.Valid {
 
@@ -88,8 +86,8 @@ func Auth(perm Permission) gin.HandlerFunc {
 
 		}
 
-		// check if user meets set permissions
-		if user.Group < uint(perm) {
+		// check if user needed to be authenticated
+		if user.IsAuthenticated != authenticated {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(e.ErrUnauthorized)
 			c.Abort()
