@@ -62,7 +62,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			if err == nil && token.Valid {
 
 				// get uid from jwt, cast to float
-				jtw_uid, ok := token.Claims["user_id"].(float64)
+				jwt_uid, ok := token.Claims["user_id"].(float64)
 				if !ok {
 					c.JSON(e.ErrorMessage(e.ErrInternalError))
 					c.Error(err)
