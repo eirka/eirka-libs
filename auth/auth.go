@@ -46,51 +46,50 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 			// compare with secret from settings
 			return []byte(Secret), nil
+
 		})
+		// if theres some jwt error other than no token in request then return unauth
 		if err != nil && err != jwt.ErrNoTokenInRequest {
-			// if theres some jwt error then return unauth
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(err)
 			c.Abort()
 			return
 		}
 
-		// process token
-		if token != nil {
+		// if there is a token and its not valid
+		if token != nil && err == nil && !token.Valid {
+			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
+			c.Error(e.ErrTokenInvalid)
+			c.Abort()
+			return
+		}
 
-			// if the token is valid set the data
-			if err == nil && token.Valid {
+		// process token if its there and valid
+		if token != nil && err == nil && token.Valid {
 
-				// get uid from jwt, cast to float
-				jwt_uid, ok := token.Claims["user_id"].(float64)
-				if !ok {
-					c.JSON(e.ErrorMessage(e.ErrInternalError))
-					c.Error(err)
-					c.Abort()
-					return
-				}
-
-				// cast to uint
-				uid := uint(jwt_uid)
-
-				// these are invalid uids
-				if uid == 0 || uid == 1 {
-					c.JSON(e.ErrorMessage(e.ErrInternalError))
-					c.Error(e.ErrInvalidUid)
-					c.Abort()
-					return
-				}
-
-				// set user id in user struct and isauthenticated
-				user.Id = uid
-				user.IsAuthenticated = true
-
-			} else {
+			// get uid from jwt, cast to float
+			jwt_uid, ok := token.Claims[user_id_claim].(float64)
+			if !ok {
 				c.JSON(e.ErrorMessage(e.ErrInternalError))
-				c.Error(err)
+				c.Error(e.ErrInternalError)
 				c.Abort()
 				return
 			}
+
+			// cast to uint
+			uid := uint(jwt_uid)
+
+			// these are invalid uids
+			if uid == 0 || uid == 1 {
+				c.JSON(e.ErrorMessage(e.ErrInternalError))
+				c.Error(e.ErrInvalidUid)
+				c.Abort()
+				return
+			}
+
+			// set user id in user struct and isauthenticated to true
+			user.Id = uid
+			user.IsAuthenticated = true
 
 		}
 

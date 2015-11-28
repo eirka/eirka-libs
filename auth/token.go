@@ -7,6 +7,10 @@ import (
 	e "github.com/techjanitor/pram-libs/errors"
 )
 
+const (
+	user_id_claim = "user_id"
+)
+
 // Creates a JWT token with our claims
 func CreateToken(uid uint) (newtoken string, err error) {
 
@@ -23,7 +27,7 @@ func CreateToken(uid uint) (newtoken string, err error) {
 	token.Claims["iss"] = "pram"
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["exp"] = time.Now().Add(time.Hour * 24 * 90).Unix()
-	token.Claims["user_id"] = uid
+	token.Claims[user_id_claim] = uid
 
 	// Sign and get the complete encoded token as a string
 	newtoken, err = token.SignedString([]byte(Secret))
