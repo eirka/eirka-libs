@@ -12,6 +12,12 @@ import (
 // holds the hmac secret, is set from main
 var Secret string
 
+// user struct
+type User struct {
+	Id              uint
+	IsAuthenticated bool
+}
+
 // checks for session cookie and handles permissions
 func Auth(authenticated bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -65,17 +71,20 @@ func Auth(authenticated bool) gin.HandlerFunc {
 					return
 				}
 
-				// set user id in user struct
-				user.Id = uint(uid)
+				// cast to uint
+				uid = uint(uid)
 
-				// get the rest of the user info
-				err = user.Info()
-				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error_message": err.Error()})
-					c.Error(err)
+				// these are invalid uids
+				if uid == 0 || uid == 1 {
+					c.JSON(e.ErrorMessage(e.ErrInternalError))
+					c.Error(e.ErrInvalidParam)
 					c.Abort()
 					return
 				}
+
+				// set user id in user struct and isauthenticated
+				user.Id = uid
+				user.IsAuthenticated = true
 
 			} else {
 				c.JSON(e.ErrorMessage(e.ErrInternalError))
