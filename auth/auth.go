@@ -19,8 +19,8 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// error if theres no secret set
 		if Secret == "" {
 			c.JSON(e.ErrorMessage(e.ErrInternalError))
-			c.Error(e.ErrInternalError)
-			c.Abort(e.ErrNoSecret)
+			c.Error(e.ErrNoSecret)
+			c.Abort()
 			return
 		}
 

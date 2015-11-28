@@ -3,6 +3,8 @@ package auth
 import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"time"
+
+	e "github.com/techjanitor/pram-libs/errors"
 )
 
 // Creates a JWT token with our claims
@@ -10,7 +12,8 @@ func CreateToken(uid uint) (newtoken string, err error) {
 
 	// error if theres no secret set
 	if Secret == "" {
-		return nil, e.ErrNoSecret
+		err = e.ErrNoSecret
+		return
 	}
 
 	// Create the token
