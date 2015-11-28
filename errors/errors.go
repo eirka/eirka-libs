@@ -56,6 +56,7 @@ var (
 	ErrUserLocked       error = errors.New("Account locked")
 	ErrUserNotExist     error = errors.New("User does not exist")
 	ErrNoSecret         error = errors.New("No secret key was set")
+	ErrInvalidUid       error = errors.New("Invalid uid")
 )
 
 type RequestError struct {

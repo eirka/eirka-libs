@@ -76,7 +76,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 				// these are invalid uids
 				if uid == 0 || uid == 1 {
 					c.JSON(e.ErrorMessage(e.ErrInternalError))
-					c.Error(e.ErrInvalidParam)
+					c.Error(e.ErrInvalidUid)
 					c.Abort()
 					return
 				}
