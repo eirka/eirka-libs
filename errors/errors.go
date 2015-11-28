@@ -45,6 +45,7 @@ var (
 	ErrIpParse          error = errors.New("Input IP cannot be parsed")
 	ErrDuplicateName    error = errors.New("Name already registered")
 	ErrInvalidEmail     error = errors.New("Invalid email address")
+	ErrEmailSame        error = errors.New("Email address the same")
 	ErrInvalidUser      error = errors.New("User not found")
 	ErrInvalidPassword  error = errors.New("Password incorrect")
 	ErrInvalidSession   error = errors.New("Invalid session")
