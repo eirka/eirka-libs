@@ -1,8 +1,6 @@
 package perms
 
 import (
-	"database/sql"
-
 	"github.com/techjanitor/pram-libs/db"
 	e "github.com/techjanitor/pram-libs/errors"
 )
@@ -29,7 +27,7 @@ func Check(uid, ib uint) (allowed bool, err error) {
 	err = dbase.QueryRow(`SELECT COALESCE((SELECT MAX(role_id) FROM user_ib_role_map WHERE user_ib_role_map.user_id = users.user_id AND ib_id = ?),user_role_map.role_id) as role
     FROM users
     INNER JOIN user_role_map ON (user_role_map.user_id = users.user_id)
-    WHERE users.user_id = ?`, u.Id).Scan(&role)
+    WHERE users.user_id = ?`, ib, uid).Scan(&role)
 	if err != nil {
 		return
 	}
