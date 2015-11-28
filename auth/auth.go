@@ -87,7 +87,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		}
 
 		// check if user needed to be authenticated
-		if user.IsAuthenticated != authenticated {
+		if authenticated && !user.IsAuthenticated {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(e.ErrUnauthorized)
 			c.Abort()
