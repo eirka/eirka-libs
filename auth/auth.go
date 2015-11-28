@@ -4,7 +4,6 @@ import (
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"net/http"
 
 	e "github.com/techjanitor/pram-libs/errors"
 )
@@ -63,7 +62,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			if err == nil && token.Valid {
 
 				// get uid from jwt, cast to float
-				uid, ok := token.Claims["user_id"].(float64)
+				jtw_uid, ok := token.Claims["user_id"].(float64)
 				if !ok {
 					c.JSON(e.ErrorMessage(e.ErrInternalError))
 					c.Error(err)
@@ -72,7 +71,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 				}
 
 				// cast to uint
-				uid = uint(uid)
+				uid = uint(jwt_uid)
 
 				// these are invalid uids
 				if uid == 0 || uid == 1 {
