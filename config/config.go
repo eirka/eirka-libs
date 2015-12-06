@@ -33,14 +33,6 @@ type Config struct {
 		Key    string
 	}
 
-	// settings for amazon lambda
-	Lambda struct {
-		Thumbnail struct {
-			Endpoint string
-			Key      string
-		}
-	}
-
 	// settings for google storage
 	Google struct {
 		Auth   string
