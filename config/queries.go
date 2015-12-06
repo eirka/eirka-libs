@@ -197,6 +197,16 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
+	err = ps.QueryRow("lambda_thumbnail_endpoint").Scan(&Settings.Lambda.Thumbnail.Endpoint)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("lambda_thumbnail_key").Scan(&Settings.Lambda.Thumbnail.Key)
+	if err != nil {
+		panic(err)
+	}
+
 	return
 
 }
