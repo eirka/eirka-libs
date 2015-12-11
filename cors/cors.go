@@ -40,7 +40,7 @@ func CORS() gin.HandlerFunc {
 			// Add allowed headers header
 			c.Header("Access-Control-Allow-Headers", strings.Join(defaultAllowHeaders, ","))
 
-			c.Header("Access-Control-Max-Age", "600")
+			c.Header("Access-Control-Max-Age", "3600")
 
 			c.AbortWithStatus(http.StatusOK)
 
