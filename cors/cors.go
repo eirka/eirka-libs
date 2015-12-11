@@ -10,7 +10,7 @@ import (
 
 var (
 	validSites          = map[string]bool{}
-	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization", "ib_id"}
+	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
 	defaultAllowMethods []string
 )
 
@@ -24,8 +24,6 @@ func CORS() gin.HandlerFunc {
 		// Set origin header from sites config
 		if isAllowedSite(origin) {
 			c.Header("Access-Control-Allow-Origin", origin)
-		} else {
-			c.Header("Access-Control-Allow-Origin", "")
 		}
 
 		c.Header("Vary", "Origin")
@@ -40,7 +38,7 @@ func CORS() gin.HandlerFunc {
 			// Add allowed headers header
 			c.Header("Access-Control-Allow-Headers", strings.Join(defaultAllowHeaders, ","))
 
-			c.Header("Access-Control-Max-Age", "3600")
+			c.Header("Access-Control-Max-Age", "86400")
 
 			c.AbortWithStatus(http.StatusOK)
 
