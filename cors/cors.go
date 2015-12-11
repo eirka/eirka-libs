@@ -28,6 +28,8 @@ func CORS() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Origin", "")
 		}
 
+		c.Header("Vary", "Origin")
+
 		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if req.Method == "OPTIONS" {
@@ -37,6 +39,8 @@ func CORS() gin.HandlerFunc {
 
 			// Add allowed headers header
 			c.Header("Access-Control-Allow-Headers", strings.Join(defaultAllowHeaders, ","))
+
+			c.Header("Access-Control-Max-Age", "600")
 
 			c.AbortWithStatus(http.StatusOK)
 
