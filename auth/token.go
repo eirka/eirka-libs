@@ -4,7 +4,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"time"
 
-	e "github.com/techjanitor/pram-libs/errors"
+	e "github.com/eirka/eirka-libs/errors"
 )
 
 const (

@@ -1,6 +1,6 @@
 package config
 
-import "github.com/techjanitor/pram-libs/db"
+import "github.com/eirka/eirka-libs/db"
 
 // Get limits that are in the database
 func GetDatabaseSettings() {

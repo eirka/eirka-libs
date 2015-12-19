@@ -5,7 +5,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	e "github.com/techjanitor/pram-libs/errors"
+	e "github.com/eirka/eirka-libs/errors"
 )
 
 // holds the hmac secret, is set from main

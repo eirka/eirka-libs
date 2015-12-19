@@ -3,7 +3,7 @@ package validate
 import (
 	"github.com/gin-gonic/gin"
 
-	e "github.com/techjanitor/pram-libs/errors"
+	e "github.com/eirka/eirka-libs/errors"
 )
 
 // ValidateParams will loop through the route parameters to make sure theyre uint

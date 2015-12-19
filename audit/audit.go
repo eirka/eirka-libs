@@ -1,6 +1,6 @@
 package audit
 
-import "github.com/techjanitor/pram-libs/db"
+import "github.com/eirka/eirka-libs/db"
 
 // Audit adds an action to the audit log
 type Audit struct {
