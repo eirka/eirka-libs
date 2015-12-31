@@ -23,7 +23,7 @@ type Database struct {
 func (d *Database) NewDb() {
 	var err error
 
-	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s",
+	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true",
 		d.User,
 		d.Password,
 		d.Proto,
