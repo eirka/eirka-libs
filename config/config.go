@@ -14,6 +14,11 @@ type Config struct {
 		AutoRegistration bool
 	}
 
+	Prim struct {
+		Css string
+		Js  string
+	}
+
 	Akismet struct {
 		// Akismet settings
 		Key  string

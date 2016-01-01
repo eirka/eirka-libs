@@ -197,6 +197,16 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
+	err = ps.QueryRow("prim_js").Scan(&Settings.Prim.Js)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("prim_css").Scan(&Settings.Prim.Css)
+	if err != nil {
+		panic(err)
+	}
+
 	return
 
 }
