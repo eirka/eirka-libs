@@ -3,6 +3,7 @@ package user
 import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
+	"regexp"
 	"strings"
 	"time"
 
