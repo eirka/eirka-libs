@@ -2,7 +2,7 @@ package redis
 
 import (
 	"errors"
-	"fmt"
+	"github.com/garyburd/redigo/redis"
 	"strings"
 )
 
@@ -62,6 +62,7 @@ func (r *RedisKey) SetKey(ids ...string) (err error) {
 func (r *RedisKey) SetHashId(id uint) {
 	r.hashid = id
 	r.hashidset = true
+
 	return
 }
 
@@ -70,7 +71,7 @@ func (r *RedisKey) String() string {
 		return r.key
 	}
 
-	return
+	return ""
 }
 
 func (r *RedisKey) IsValid() bool {
