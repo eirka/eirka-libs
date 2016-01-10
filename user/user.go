@@ -3,6 +3,7 @@ package user
 import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 
 	"github.com/eirka/eirka-libs/db"
@@ -13,6 +14,22 @@ const (
 	// claim key for jwt token
 	user_id_claim = "user_id"
 )
+
+// reserved name list
+var reservedNameList = map[string]bool{
+	"admin":          true,
+	"administrator":  true,
+	"administration": true,
+	"support":        true,
+	"mod":            true,
+	"moderator":      true,
+	"anon":           true,
+	"anonymous":      true,
+	"root":           true,
+	"webmaster":      true,
+	"username":       true,
+	"user":           true,
+}
 
 // user struct
 type User struct {
@@ -61,6 +78,16 @@ func (u *User) SetId(uid uint) {
 func (u *User) SetAuthenticated() {
 	u.IsAuthenticated = true
 	return
+}
+
+// checks if the name is on the reserved list
+func IsReservedName(name string) bool {
+
+	if reservedNameList[strings.ToLower(name)] {
+		return true
+	}
+
+	return false
 }
 
 func (u *User) FromName(name string) (err error) {
