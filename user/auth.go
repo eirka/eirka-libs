@@ -1,4 +1,4 @@
-package auth
+package user
 
 import (
 	"fmt"
@@ -10,12 +10,6 @@ import (
 
 // holds the hmac secret, is set from main
 var Secret string
-
-// user struct
-type User struct {
-	Id              uint
-	IsAuthenticated bool
-}
 
 // checks for session cookie and handles permissions
 func Auth(authenticated bool) gin.HandlerFunc {
@@ -30,10 +24,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		}
 
 		// set default anonymous user
-		user := User{
-			Id:              1,
-			IsAuthenticated: false,
-		}
+		user := DefaultUser()
 
 		// parse jwt token if its there
 		token, err := jwt.ParseFromRequest(c.Request, func(token *jwt.Token) (interface{}, error) {
@@ -79,17 +70,17 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			// cast to uint
 			uid := uint(jwt_uid)
 
-			// these are invalid uids
-			if uid == 0 || uid == 1 {
-				c.JSON(e.ErrorMessage(e.ErrInternalError))
-				c.Error(e.ErrInvalidUid)
+			// set the user id
+			user.SetId(uid)
+			// set authenticated
+			user.SetAuthenticated()
+
+			if !user.IsValid() {
+				c.JSON(e.ErrorMessage(e.ErrUnauthorized))
+				c.Error(e.ErrUserNotValid)
 				c.Abort()
 				return
 			}
-
-			// set user id in user struct and isauthenticated to true
-			user.Id = uid
-			user.IsAuthenticated = true
 
 		}
 

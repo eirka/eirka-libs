@@ -59,6 +59,7 @@ var (
 	ErrNoSecret         error = errors.New("No secret key was set")
 	ErrInvalidUid       error = errors.New("Invalid uid")
 	ErrTokenInvalid     error = errors.New("Invalid token")
+	ErrUserNotValid     error = errors.New("User is not valid")
 )
 
 type RequestError struct {
