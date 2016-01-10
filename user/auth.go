@@ -67,7 +67,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 		})
 		// if theres some jwt error other than no token in request or the token is invalid then return unauth
-		if err != nil && err != jwt.ErrNoTokenInRequest || !token.Valid {
+		if err != nil && err != jwt.ErrNoTokenInRequest {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(err)
 			c.Abort()
@@ -75,7 +75,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		}
 
 		// check if user needed to be authenticated
-		if authenticated && !user.IsAuthenticated {
+		if authenticated && !user.IsAuthenticated || !token.Valid {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(e.ErrUnauthorized)
 			c.Abort()
