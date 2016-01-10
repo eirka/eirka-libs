@@ -97,18 +97,19 @@ func CheckDuplicate(name string) (check bool) {
 
 	// password length cant be 0
 	if len(name) == 0 {
-		return false
+		return true
 	}
 
 	// Get Database handle
 	dbase, err := db.GetDb()
 	if err != nil {
-		return false
+		return true
 	}
 
+	// this will return true if there is a user
 	err = dbase.QueryRow("select count(*) from users where user_name = ?", name).Scan(&check)
 	if err != nil {
-		return false
+		return true
 	}
 
 	return
