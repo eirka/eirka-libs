@@ -35,53 +35,43 @@ func Auth(authenticated bool) gin.HandlerFunc {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
+			// get the issuer from claims
+			token_issuer, ok := token.Claims[jwt_claim_issuer].(string)
+			if !ok {
+				return nil, fmt.Errorf("Couldnt find issuer")
+			}
+
+			// check the issuer
+			if token_issuer != jwt_issuer {
+				return nil, fmt.Errorf("Incorrect issuer")
+			}
+
+			// get uid from token
+			token_uid, ok := token.Claims[jwt_claim_user_id].(float64)
+			if !ok {
+				return nil, fmt.Errorf("Couldnt find user id")
+			}
+
+			// set the user id
+			user.SetId(uint(token_uid))
+			// set authenticated
+			user.SetAuthenticated()
+
+			// check that the generated user is valid
+			if !user.IsValid() {
+				return nil, fmt.Errorf("Generated invalid user")
+			}
+
 			// compare with secret from settings
 			return []byte(Secret), nil
 
 		})
-		// if theres some jwt error other than no token in request then return unauth
-		if err != nil && err != jwt.ErrNoTokenInRequest {
+		// if theres some jwt error other than no token in request or the token is invalid then return unauth
+		if err != nil && err != jwt.ErrNoTokenInRequest || !token.Valid {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(err)
 			c.Abort()
 			return
-		}
-
-		// if there is a token and its not valid
-		if token != nil && err == nil && !token.Valid {
-			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-			c.Error(e.ErrTokenInvalid)
-			c.Abort()
-			return
-		}
-
-		// process token if its there and valid
-		if token != nil && err == nil && token.Valid {
-
-			// get uid from jwt, cast to float
-			jwt_uid, ok := token.Claims[user_id_claim].(float64)
-			if !ok {
-				c.JSON(e.ErrorMessage(e.ErrInternalError))
-				c.Error(e.ErrInternalError)
-				c.Abort()
-				return
-			}
-
-			// cast to uint
-			uid := uint(jwt_uid)
-
-			// set the user id
-			user.SetId(uid)
-			// set authenticated
-			user.SetAuthenticated()
-
-			if !user.IsValid() {
-				c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-				c.Error(e.ErrUserNotValid)
-				c.Abort()
-				return
-			}
-
 		}
 
 		// check if user needed to be authenticated

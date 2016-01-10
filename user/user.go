@@ -11,9 +11,22 @@ import (
 )
 
 const (
-	// claim key for jwt token
-	user_id_claim = "user_id"
+	// jwt claim keys
+	jwt_claim_issuer    = "iss"
+	jwt_claim_issued    = "iat"
+	jwt_claim_notbefore = "nbf"
+	jwt_claim_expire    = "exp"
+	jwt_claim_user_id   = "user_id"
+	// jwt issuer
+	jwt_issuer = "pram"
+	// jwt expire days
+	jwt_expire_days = 90
+
+	// the username validation regex
+	username = `^([a-zA-Z0-9]+[\s_-]?)+$`
 )
+
+var regexUsername = regexp.MustCompile(username)
 
 // reserved name list
 var reservedNameList = map[string]bool{
@@ -80,14 +93,14 @@ func (u *User) SetAuthenticated() {
 	return
 }
 
-// checks if the name is on the reserved list
-func IsReservedName(name string) bool {
+// checks if the name is valid
+func IsValidName(name string) bool {
 
 	if reservedNameList[strings.ToLower(name)] {
-		return true
+		return false
 	}
 
-	return false
+	return regexUsername.MatchString(name)
 }
 
 func (u *User) FromName(name string) (err error) {
@@ -159,12 +172,15 @@ func (u *User) CreateToken() (newtoken string, err error) {
 
 	// Create the token
 	token := jwt.New(jwt.SigningMethodHS256)
+	// the current time
+	now := time.Now()
 
 	// Set our claims
-	token.Claims["iss"] = "pram"
-	token.Claims["iat"] = time.Now().Unix()
-	token.Claims["exp"] = time.Now().Add(time.Hour * 24 * 90).Unix()
-	token.Claims[user_id_claim] = u.Id
+	token.Claims[jwt_claim_issuer] = jwt_issuer
+	token.Claims[jwt_claim_issued] = now.Unix()
+	token.Claims[jwt_claim_notbefore] = now.Unix()
+	token.Claims[jwt_claim_expire] = now.Add(time.Hour * 24 * jwt_expire_days).Unix()
+	token.Claims[jwt_claim_user_id] = u.Id
 
 	// Sign and get the complete encoded token as a string
 	newtoken, err = token.SignedString([]byte(Secret))
