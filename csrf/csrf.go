@@ -54,10 +54,13 @@ func Cookie() gin.HandlerFunc {
 
 		}
 
+		// generate a session token
+		session_token := b64encode(maskToken(csrfToken))
+
 		// set the users csrf token tookie
 		sessionCookie := &http.Cookie{
 			Name:  SessionName,
-			Value: b64encode(maskToken(csrfToken)),
+			Value: session_token,
 			Path:  "/",
 		}
 
@@ -65,7 +68,7 @@ func Cookie() gin.HandlerFunc {
 		http.SetCookie(c.Writer, sessionCookie)
 
 		// pass token to controllers
-		c.Set("csrf_token", string(sessionCookie))
+		c.Set("csrf_token", string(session_token))
 
 		c.Next()
 
@@ -92,7 +95,7 @@ func Verify() gin.HandlerFunc {
 
 		// Then POST values
 		if len(sentToken) == 0 {
-			sentToken = r.PostFormValue(FormFieldName)
+			sentToken = c.PostForm(FormFieldName)
 		}
 
 		// error if there was no csrf token or it isnt verified
