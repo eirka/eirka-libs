@@ -91,7 +91,7 @@ func Verify() gin.HandlerFunc {
 		var sentToken string
 
 		// Prefer the header over form value
-		sentToken = c.Header.Get(HeaderName)
+		sentToken = c.Request.Header.Get(HeaderName)
 
 		// Then POST values
 		if len(sentToken) == 0 {
