@@ -60,6 +60,7 @@ var (
 	ErrInvalidUid       error = errors.New("Invalid uid")
 	ErrTokenInvalid     error = errors.New("Invalid token")
 	ErrUserNotValid     error = errors.New("User is not valid")
+	ErrCsrfNotValid     error = errors.New("CSRF token is not valid")
 )
 
 type RequestError struct {
