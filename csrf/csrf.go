@@ -18,7 +18,13 @@ const (
 	SessionName = "XSRF-TOKEN"
 )
 
-var ()
+// skip these methods
+var skipMethods = map[string]bool{
+	"GET":     true,
+	"HEAD":    true,
+	"OPTIONS": true,
+	"TRACE":   true,
+}
 
 // generates two cookies: a long term csrf token for a user, and a masked session token to verify against
 func Cookie() gin.HandlerFunc {
@@ -78,6 +84,12 @@ func Cookie() gin.HandlerFunc {
 // verify the sent csrf token
 func Verify() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		// if this is a skippable method
+		if skipMethods[c.Request.Method] {
+			c.Next()
+			return
+		}
 
 		// the token from the users cookie
 		var csrfToken []byte
