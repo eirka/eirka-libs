@@ -18,7 +18,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// error if theres no secret set
 		if Secret == "" {
 			c.JSON(e.ErrorMessage(e.ErrInternalError))
-			c.Error(e.ErrNoSecret)
+			c.Error(e.ErrNoSecret).SetMeta("auth.Auth")
 			c.Abort()
 			return
 		}
@@ -69,7 +69,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// if theres some jwt error other than no token in request or the token is invalid then return unauth
 		if err != nil && err != jwt.ErrNoTokenInRequest || token != nil && !token.Valid {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-			c.Error(err)
+			c.Error(err).SetMeta("auth.Auth")
 			c.Abort()
 			return
 		}
@@ -77,7 +77,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// check if user needed to be authenticated
 		if authenticated && !user.IsAuthenticated {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-			c.Error(e.ErrUnauthorized)
+			c.Error(e.ErrUnauthorized).SetMeta("auth.Auth")
 			c.Abort()
 			return
 		}

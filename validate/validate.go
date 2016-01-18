@@ -19,7 +19,7 @@ func ValidateParams() gin.HandlerFunc {
 				pid, err := ValidateParam(param.Value)
 				if err != nil {
 					c.JSON(e.ErrorMessage(e.ErrInvalidParam))
-					c.Error(e.ErrInvalidParam)
+					c.Error(err).SetMeta("validate.ValidateParams")
 					c.Abort()
 					return
 				}
