@@ -1,7 +1,6 @@
 package validate
 
 import (
-	"regexp"
 	"strconv"
 
 	"github.com/eirka/eirka-libs/config"
