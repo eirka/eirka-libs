@@ -6,7 +6,7 @@ import (
 
 // Get will retrieve a key
 func (c *RedisStore) Get(key string) (result []byte, err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	raw, err := conn.Do("GET", key)
@@ -23,7 +23,7 @@ func (c *RedisStore) Get(key string) (result []byte, err error) {
 
 // HGet will retrieve a hash
 func (c *RedisStore) HGet(key string, value string) (result []byte, err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	raw, err := conn.Do("HGET", key, value)
@@ -40,7 +40,7 @@ func (c *RedisStore) HGet(key string, value string) (result []byte, err error) {
 
 // Set will set a single record
 func (c *RedisStore) Set(key string, result []byte) (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("SET", key, result)
@@ -50,7 +50,7 @@ func (c *RedisStore) Set(key string, result []byte) (err error) {
 
 // Set will set a single record
 func (c *RedisStore) SetEx(key string, timeout uint, result []byte) (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("SETEX", key, timeout, result)
@@ -60,7 +60,7 @@ func (c *RedisStore) SetEx(key string, timeout uint, result []byte) (err error) 
 
 // HMSet will set a hash
 func (c *RedisStore) HMSet(key string, value string, result []byte) (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("HMSET", key, value, result)
@@ -70,7 +70,7 @@ func (c *RedisStore) HMSet(key string, value string, result []byte) (err error) 
 
 // Delete will delete a key
 func (c *RedisStore) Delete(key ...interface{}) (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("DEL", key...)
@@ -80,7 +80,7 @@ func (c *RedisStore) Delete(key ...interface{}) (err error) {
 
 // Flush will call flushall and delete all keys
 func (c *RedisStore) Flush() (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("FLUSHALL")
@@ -90,7 +90,7 @@ func (c *RedisStore) Flush() (err error) {
 
 // will increment a redis key
 func (c *RedisStore) Incr(key string) (result int, err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	raw, err := conn.Do("INCR", key)
@@ -107,7 +107,7 @@ func (c *RedisStore) Incr(key string) (result int, err error) {
 
 // will set expire on a redis key
 func (c *RedisStore) Expire(key string, timeout uint) (err error) {
-	conn := c.pool.Get()
+	conn := c.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("EXPIRE", key, timeout)

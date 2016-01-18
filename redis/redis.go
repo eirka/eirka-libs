@@ -8,7 +8,7 @@ import (
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
-	pool *redis.Pool
+	Pool *redis.Pool
 }
 
 var (
