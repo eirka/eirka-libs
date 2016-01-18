@@ -110,6 +110,30 @@ func IsValidName(name string) bool {
 	return regexUsername.MatchString(name)
 }
 
+// will get the password and name from the database for an instantiated user
+func (u *User) Password() (err error) {
+
+	// check user struct validity
+	if !u.IsValid() {
+		return e.ErrUserNotValid
+	}
+
+	// Get Database handle
+	dbase, err := db.GetDb()
+	if err != nil {
+		return
+	}
+
+	// get hashed password from database
+	err = dbase.QueryRow("select user_name, user_password from users where user_id = ?", u.Id).Scan(&u.Name, &u.hash)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// will get the password and user id from the database for a user name
 func (u *User) FromName(name string) (err error) {
 
 	// password length cant be 0
