@@ -76,7 +76,7 @@ func (err *RequestError) Error() string {
 	return err.ErrorString
 }
 
-func ErrorMessage(error_type *RequestError, args ...map[string]interface{}) (code int, message map[string]interface{}) {
+func ErrorMessage(error_type *RequestError) (code int, message map[string]interface{}) {
 	code = error_type.Code()
 	message = map[string]interface{}{"error_message": error_type.Error()}
 

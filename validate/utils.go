@@ -40,3 +40,14 @@ func (v *Validate) MinLength() bool {
 func (v *Validate) IsEmpty() bool {
 	return v.Input == ""
 }
+
+// clamp a value to a max and min
+func Clamp(value, max, min uint) uint {
+	if value > max {
+		return max
+	} else if value < min {
+		return min
+	}
+
+	return value
+}
