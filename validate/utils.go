@@ -7,14 +7,6 @@ import (
 	"github.com/eirka/eirka-libs/config"
 )
 
-const (
-	username = `^([a-zA-Z0-9]+[\s_-]?)+$`
-)
-
-var (
-	regexUsername = regexp.MustCompile(username)
-)
-
 // Validate will check string length
 type Validate struct {
 	Input string
@@ -48,9 +40,4 @@ func (v *Validate) MinLength() bool {
 // IsEmpty checks to see if string is empty
 func (v *Validate) IsEmpty() bool {
 	return v.Input == ""
-}
-
-// check if username matches regex
-func (v *Validate) IsUsername() bool {
-	return regexUsername.MatchString(v.Input)
 }
