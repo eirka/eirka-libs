@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"github.com/garyburd/redigo/redis"
+	"strconv"
 	"strings"
 )
 
@@ -17,7 +18,7 @@ type RedisKey struct {
 	base       string
 	fieldcount int
 	hash       bool
-	hashid     uint
+	hashid     int
 	expire     bool
 	keyset     bool
 	hashidset  bool
@@ -47,26 +48,36 @@ func init() {
 
 }
 
-func (r *RedisKey) SetKey(ids ...string) (err error) {
+func (r *RedisKey) SetKey(ids ...int) *RedisKey {
 
 	if len(ids) != r.fieldcount {
 		return errors.New("incorrect number of fields")
 	}
 
-	r.key = strings.Join([]string{r.base, strings.Join(ids, ":")}, ":")
+	var keys []string
+
+	for _, id := range ids {
+		keys = append(keys, strconv.Itoa(id))
+	}
+
+	r.key = strings.Join([]string{r.base, strings.Join(keys, ":")}, ":")
+
 	r.keyset = true
 
-	return
+	return r
 }
 
-func (r *RedisKey) SetHashId(id uint) {
+func (r *RedisKey) SetHashId(id int) {
+
 	r.hashid = id
+
 	r.hashidset = true
 
 	return
 }
 
 func (r *RedisKey) String() string {
+
 	if r.keyset {
 		return r.key
 	}
@@ -81,6 +92,10 @@ func (r *RedisKey) IsValid() bool {
 	}
 
 	if r.hash && !r.hashidset {
+		return false
+	}
+
+	if !r.hash && r.hashidset {
 		return false
 	}
 
