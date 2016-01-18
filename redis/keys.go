@@ -50,10 +50,6 @@ func init() {
 
 func (r *RedisKey) SetKey(ids ...int) *RedisKey {
 
-	if len(ids) != r.fieldcount {
-		return errors.New("incorrect number of fields")
-	}
-
 	var keys []string
 
 	for _, id := range ids {
