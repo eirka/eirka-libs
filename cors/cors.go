@@ -1,7 +1,6 @@
 package cors
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -61,12 +60,6 @@ func SetDomains(domains, methods []string) {
 
 	// set methods
 	defaultAllowMethods = methods
-
-	fmt.Println(strings.Repeat("*", 60))
-	fmt.Printf("%-20v\n\n", "CORS")
-	fmt.Printf("%-20v%40v\n", "Domains", strings.Join(domains, ", "))
-	fmt.Printf("%-20v%40v\n", "Methods", strings.Join(defaultAllowMethods, ", "))
-	fmt.Println(strings.Repeat("*", 60))
 
 	return
 }
