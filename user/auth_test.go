@@ -153,4 +153,5 @@ func TestAuthFormToken(t *testing.T) {
 	second := performJwtFormRequest(router, "GET", "/", goodtoken)
 
 	assert.Equal(t, second.Code, 200, "HTTP request code should match")
+
 }

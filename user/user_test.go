@@ -156,3 +156,47 @@ func TestCreateToken(t *testing.T) {
 	}
 
 }
+
+func TestCreateTokenAnonAuth(t *testing.T) {
+
+	Secret = "secret"
+
+	invalidUser := DefaultUser()
+	invalidUser.SetId(1)
+	invalidUser.SetAuthenticated()
+
+	notoken, err := invalidUser.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+		assert.Empty(t, notoken, "token should not be returned")
+	}
+}
+
+func TestCreateTokenZeroAuth(t *testing.T) {
+
+	Secret = "secret"
+
+	invalidUser := DefaultUser()
+	invalidUser.SetId(0)
+	invalidUser.SetAuthenticated()
+
+	notoken, err := invalidUser.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+		assert.Empty(t, notoken, "token should not be returned")
+	}
+}
+
+func TestCreateTokenZeroNoAuth(t *testing.T) {
+
+	Secret = "secret"
+
+	invalidUser := DefaultUser()
+	invalidUser.SetId(0)
+
+	notoken, err := invalidUser.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+		assert.Empty(t, notoken, "token should not be returned")
+	}
+}
