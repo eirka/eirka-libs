@@ -61,6 +61,23 @@ func DefaultUser() User {
 	}
 }
 
+// sets the user id
+func (u *User) SetId(uid uint) {
+	u.Id = uid
+	return
+}
+
+// sets authenticated
+func (u *User) SetAuthenticated() {
+	// do not set auth for the wrong users
+	if u.Id == 0 || u.Id == 1 {
+		return
+	}
+
+	u.IsAuthenticated = true
+	return
+}
+
 // check user struct validity
 func (u *User) IsValid() bool {
 
@@ -82,22 +99,10 @@ func (u *User) IsValid() bool {
 	return true
 }
 
-// sets the user id
-func (u *User) SetId(uid uint) {
-	u.Id = uid
-	return
-}
-
-// sets authenticated
-func (u *User) SetAuthenticated() {
-	u.IsAuthenticated = true
-	return
-}
-
 // checks if the name is valid
 func IsValidName(name string) bool {
 
-	if reservedNameList[strings.ToLower(name)] {
+	if reservedNameList[strings.ToLower(strings.TrimSpace(name))] {
 		return false
 	}
 
@@ -160,14 +165,27 @@ func CheckDuplicate(name string) (check bool) {
 // Creates a JWT token with our claims
 func (u *User) CreateToken() (newtoken string, err error) {
 
+	// error if theres no secret set
+	if Secret == "" {
+		err = e.ErrNoSecret
+		return
+	}
+
+	// check user struct validity
 	if !u.IsValid() {
 		err = e.ErrUserNotValid
 		return
 	}
 
-	// error if theres no secret set
-	if Secret == "" {
-		err = e.ErrNoSecret
+	// a token should never be created
+	if u.Id == 0 || u.Id == 1 {
+		err = e.ErrUserNotValid
+		return
+	}
+
+	// a token should never be created
+	if !u.IsAuthenticated {
+		err = e.ErrUserNotValid
 		return
 	}
 

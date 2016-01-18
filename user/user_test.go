@@ -1,0 +1,158 @@
+package user
+
+import (
+	e "github.com/eirka/eirka-libs/errors"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+func TestDefaultUser(t *testing.T) {
+
+	user := DefaultUser()
+
+	assert.Equal(t, uint(1), user.Id, "default user id should be 1")
+
+	assert.False(t, user.IsAuthenticated, "default user should not be authenticated")
+
+}
+
+func TestSetId(t *testing.T) {
+
+	user := DefaultUser()
+
+	user.SetId(2)
+
+	assert.Equal(t, uint(2), user.Id, "user id should be 2")
+
+}
+
+func TestSetAuthenticated(t *testing.T) {
+
+	user := DefaultUser()
+
+	user.SetAuthenticated()
+
+	assert.False(t, user.IsAuthenticated, "User should be not authorized")
+
+	user.SetId(2)
+
+	user.SetAuthenticated()
+
+	assert.True(t, user.IsAuthenticated, "User should be authorized")
+
+	assert.True(t, user.IsValid(), "Authed non-anon user should be valid")
+
+}
+
+func TestIsValid(t *testing.T) {
+
+	user := DefaultUser()
+
+	assert.True(t, user.IsValid(), "DefaultUser should be valid")
+
+	user.SetId(2)
+
+	assert.False(t, user.IsValid(), "Unauthenticated non-anon should be invalid")
+
+	user.SetAuthenticated()
+
+	assert.True(t, user.IsValid(), "Authed non-anon user should be valid")
+
+	user.SetId(0)
+
+	assert.False(t, user.IsValid(), "User zero should be invalid")
+
+	user.SetId(1)
+
+	assert.False(t, user.IsValid(), "An authenticated anon user should be invalid")
+
+}
+
+func TestIsValidName(t *testing.T) {
+
+	assert.True(t, IsValidName("cooldude2"), "Name should validate")
+
+	assert.True(t, IsValidName("cool dude"), "Name should validate")
+
+	assert.True(t, IsValidName("cool_dude"), "Name should validate")
+
+	assert.True(t, IsValidName("cool-dude"), "Name should validate")
+
+	assert.False(t, IsValidName("cool.dude"), "Name should not validate")
+
+	assert.False(t, IsValidName("cooldude!"), "Name should not validate")
+
+	assert.False(t, IsValidName("admin"), "Name should not validate")
+
+	assert.False(t, IsValidName("Admin"), "Name should not validate")
+
+	assert.False(t, IsValidName("Admin "), "Name should not validate")
+
+	assert.False(t, IsValidName(" Admin  "), "Name should not validate")
+
+}
+
+func TestPassword(t *testing.T) {
+
+	_, err := HashPassword("")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
+	}
+
+	password, err := HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, password, "password should be returned")
+	}
+
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	assert.False(t, user.ComparePassword("atestpassword"), "Password should not validate")
+
+	user.hash = password
+
+	assert.False(t, user.ComparePassword(""), "Password should not validate")
+
+	assert.False(t, user.ComparePassword("wrongpassword"), "Password should not validate")
+
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+
+}
+
+func TestCreateToken(t *testing.T) {
+
+	Secret = ""
+
+	user := DefaultUser()
+
+	token, err := user.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrNoSecret, "Error should match")
+		assert.Empty(t, token, "Token should be empty")
+	}
+
+	Secret = "secret"
+
+	token, err = user.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+		assert.Empty(t, token, "Token should be empty")
+	}
+
+	user.SetId(2)
+
+	token, err = user.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+		assert.Empty(t, token, "Token should be empty")
+	}
+
+	user.SetAuthenticated()
+
+	token, err = user.CreateToken()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotEmpty(t, token, "token should be returned")
+	}
+
+}
