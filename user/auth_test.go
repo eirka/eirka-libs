@@ -70,6 +70,8 @@ func TestAuthSecret(t *testing.T) {
 
 func TestAuthHeaderToken(t *testing.T) {
 
+	var err error
+
 	Secret = "secret"
 
 	gin.SetMode(gin.ReleaseMode)
@@ -91,6 +93,13 @@ func TestAuthHeaderToken(t *testing.T) {
 	user := DefaultUser()
 	user.SetId(2)
 	user.SetAuthenticated()
+
+	user.hash, err = HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, user.hash, "password should be returned")
+	}
+
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 
 	badtoken, err := user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {
@@ -116,6 +125,8 @@ func TestAuthHeaderToken(t *testing.T) {
 
 func TestAuthFormToken(t *testing.T) {
 
+	var err error
+
 	Secret = "secret"
 
 	gin.SetMode(gin.ReleaseMode)
@@ -133,6 +144,13 @@ func TestAuthFormToken(t *testing.T) {
 	user := DefaultUser()
 	user.SetId(2)
 	user.SetAuthenticated()
+
+	user.hash, err = HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, user.hash, "password should be returned")
+	}
+
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 
 	badtoken, err := user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {

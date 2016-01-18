@@ -51,6 +51,7 @@ type User struct {
 	Name            string
 	IsAuthenticated bool
 	hash            []byte
+	isPasswordValid bool
 }
 
 // create a user struct
@@ -189,6 +190,12 @@ func (u *User) CreateToken() (newtoken string, err error) {
 		return
 	}
 
+	// check if password was valid
+	if !u.isPasswordValid {
+		err = e.ErrInvalidPassword
+		return
+	}
+
 	// Create the token
 	token := jwt.New(jwt.SigningMethodHS256)
 	// the current time
@@ -272,7 +279,10 @@ func (u *User) ComparePassword(password string) bool {
 	// compare the stored hash with the provided password
 	err := bcrypt.CompareHashAndPassword(u.hash, []byte(password))
 
-	return err == nil
+	// we only want jwt tokens to be created after a valid password has been given
+	u.isPasswordValid = err == nil
+
+	return u.isPasswordValid
 
 }
 

@@ -126,6 +126,7 @@ func TestCreateToken(t *testing.T) {
 
 	user := DefaultUser()
 
+	// secret must be set
 	token, err := user.CreateToken()
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrNoSecret, "Error should match")
@@ -134,6 +135,7 @@ func TestCreateToken(t *testing.T) {
 
 	Secret = "secret"
 
+	// default user state should never get a token
 	token, err = user.CreateToken()
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
@@ -142,6 +144,7 @@ func TestCreateToken(t *testing.T) {
 
 	user.SetId(2)
 
+	// a non authed user should never get a token
 	token, err = user.CreateToken()
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
@@ -150,9 +153,23 @@ func TestCreateToken(t *testing.T) {
 
 	user.SetAuthenticated()
 
+	// a user that doesnt have a validated password should never get a token
+	token, err = user.CreateToken()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
+		assert.Empty(t, token, "Token should be empty")
+	}
+
+	user.hash, err = HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, user.hash, "password should be returned")
+	}
+
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+
 	token, err = user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotEmpty(t, token, "token should be returned")
+		assert.NotEmpty(t, token, "Token should not be empty")
 	}
 
 }
