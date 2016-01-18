@@ -94,12 +94,15 @@ func (r *RedisKey) Get() (result []byte, err error) {
 		return
 	}
 
-	conn := RedisStore.Pool.Get()
+	conn := RedisCache.Pool.Get()
 	defer conn.Close()
 
 	if r.hash {
 
 		result, err = redis.Bytes(conn.Do("HGET", r.key, r.hashid))
+		if err != nil {
+			return
+		}
 		if result == nil {
 			return nil, ErrCacheMiss
 		}
@@ -107,6 +110,9 @@ func (r *RedisKey) Get() (result []byte, err error) {
 	} else {
 
 		result, err = redis.Bytes(conn.Do("GET", r.key))
+		if err != nil {
+			return
+		}
 		if result == nil {
 			return nil, ErrCacheMiss
 		}
@@ -123,17 +129,26 @@ func (r *RedisKey) Set(data []byte) (err error) {
 		return
 	}
 
-	conn := RedisStore.Pool.Get()
+	conn := RedisCache.Pool.Get()
 	defer conn.Close()
 
 	if r.hash {
 		_, err = conn.Do("HMSET", r.key, r.hashid, data)
+		if err != nil {
+			return
+		}
 	} else {
 		_, err = conn.Do("SET", r.key, data)
+		if err != nil {
+			return
+		}
 	}
 
 	if r.expire {
 		_, err = conn.Do("EXPIRE", r.key, timeout)
+		if err != nil {
+			return
+		}
 	}
 
 	return

@@ -26,7 +26,7 @@ type Redis struct {
 
 // NewRedisCache creates a new pool
 func (r *Redis) NewRedisCache() {
-	RedisCache.pool = &redis.Pool{
+	RedisCache.Pool = &redis.Pool{
 		MaxIdle:     r.MaxIdle,
 		MaxActive:   r.MaxConnections,
 		IdleTimeout: 240 * time.Second,
