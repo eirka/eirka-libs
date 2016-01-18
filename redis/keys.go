@@ -18,7 +18,7 @@ type RedisKey struct {
 	base       string
 	fieldcount int
 	hash       bool
-	hashid     int
+	hashid     uint
 	expire     bool
 	keyset     bool
 	hashidset  bool
@@ -48,12 +48,12 @@ func init() {
 
 }
 
-func (r *RedisKey) SetKey(ids ...int) *RedisKey {
+func (r *RedisKey) SetKey(ids ...uint) *RedisKey {
 
 	var keys []string
 
 	for _, id := range ids {
-		keys = append(keys, strconv.Itoa(id))
+		keys = append(keys, strconv.Itoa(int(id)))
 	}
 
 	r.key = strings.Join([]string{r.base, strings.Join(keys, ":")}, ":")
@@ -63,7 +63,7 @@ func (r *RedisKey) SetKey(ids ...int) *RedisKey {
 	return r
 }
 
-func (r *RedisKey) SetHashId(id int) {
+func (r *RedisKey) SetHashId(id uint) {
 
 	r.hashid = id
 
