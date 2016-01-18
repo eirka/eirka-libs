@@ -1,10 +1,8 @@
-package storage
+package amazon
 
 import (
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"os"
@@ -12,34 +10,8 @@ import (
 	"github.com/eirka/eirka-libs/config"
 )
 
-type AmazonS3 struct {
-	session *session.Session
-}
-
-// create aws session with credentials
-func (a *AmazonS3) auth() (err error) {
-
-	// new credentials from settings
-	creds := credentials.NewStaticCredentials(config.Settings.Amazon.Id, config.Settings.Amazon.Key, "")
-
-	// create our session
-	a.session = session.New(&aws.Config{
-		Region:      aws.String(config.Settings.Amazon.Region),
-		Credentials: creds,
-		MaxRetries:  aws.Int(10),
-	})
-
-	return
-
-}
-
 // Upload a file to S3
-func (a *AmazonS3) Save(filepath, filename, mime string) (err error) {
-
-	err = a.auth()
-	if err != nil {
-		return
-	}
+func (a *Amazon) Save(filepath, filename, mime string) (err error) {
 
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -64,12 +36,7 @@ func (a *AmazonS3) Save(filepath, filename, mime string) (err error) {
 }
 
 // Delete a file from S3
-func (a *AmazonS3) Delete(key string) (err error) {
-
-	err = a.auth()
-	if err != nil {
-		return
-	}
+func (a *Amazon) Delete(key string) (err error) {
 
 	svc := s3.New(a.session)
 
