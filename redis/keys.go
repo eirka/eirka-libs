@@ -42,7 +42,7 @@ func init() {
 
 	// key index map
 	for _, key := range RedisKeys {
-		RedisKeyIndex[key.key] = key
+		RedisKeyIndex[key.base] = key
 	}
 
 }
