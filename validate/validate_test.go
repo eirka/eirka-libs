@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/eirka/eirka-libs/config"
 )
 
 var (
@@ -21,6 +23,8 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 }
 
 func TestValidateParams(t *testing.T) {
+
+	config.Settings.Limits.ParamMaxSize = 10
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -38,8 +42,12 @@ func TestValidateParams(t *testing.T) {
 
 	assert.Equal(t, first.Code, 400, "HTTP request code should match")
 
-	second := performRequest(router, "GET", "/index/1")
+	second := performRequest(router, "GET", "/index/12")
 
-	assert.Equal(t, second.Code, 200, "HTTP request code should match")
+	assert.Equal(t, second.Code, 400, "HTTP request code should match")
+
+	third := performRequest(router, "GET", "/index/1")
+
+	assert.Equal(t, third.Code, 200, "HTTP request code should match")
 
 }

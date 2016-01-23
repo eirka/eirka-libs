@@ -19,17 +19,19 @@ func TestValidate(t *testing.T) {
 
 	assert.False(t, test.MinLength(), "Should be greater than min")
 
+	assert.Equal(t, test.Input, "valid", "Should be the same")
+
 	bad := Validate{
 		Input: "",
 		Max:   8,
 		Min:   3,
 	}
 
-	assert.True(t, bad.IsEmpty(), "Should  be empty")
+	assert.True(t, bad.IsEmpty(), "Should be empty")
 
 	assert.False(t, bad.MaxLength(), "Should not be greater than max")
 
-	assert.False(t, bad.MinLength(), "Should be less than min")
+	assert.True(t, bad.MinLength(), "Should be less than min")
 
 	long := Validate{
 		Input: "waytoolongstring",
@@ -50,6 +52,28 @@ func TestValidate(t *testing.T) {
 	assert.False(t, short.MaxLength(), "Should not be greater than max")
 
 	assert.True(t, short.MinLength(), "Should be less than min")
+
+	weird := Validate{
+		Input: "hi this is long but invalid because of the first two chars",
+		Max:   100,
+		Min:   3,
+	}
+
+	assert.False(t, weird.MaxLength(), "Should not be greater than max")
+
+	assert.True(t, weird.MinLength(), "Should be less than min")
+
+	weird2 := Validate{
+		Input: "hello this is long but invalid because of the first two chars",
+		Max:   100,
+		Min:   3,
+	}
+
+	assert.False(t, weird2.MaxLength(), "Should not be greater than max")
+
+	assert.False(t, weird2.MinLength(), "Should be more than min")
+
+	assert.Equal(t, weird2.Input, "hello this is long but invalid because of the first two chars", "Should be the same")
 
 }
 
