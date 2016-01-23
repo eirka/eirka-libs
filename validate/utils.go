@@ -37,11 +37,15 @@ func ValidateParam(param string) (id uint, err error) {
 
 // MaxLength checks string for length
 func (v *Validate) MaxLength() bool {
-	return len(v.Input) > v.Max
+	return len(v.Input) > v.Max && len(v.Input) != 0
 }
 
 // MinLength checks string for length
 func (v *Validate) MinLength() bool {
+	return len(v.Input) < v.Min || len(v.Input) == 0
+}
+
+func (v *Validate) MinPartsLength() bool {
 
 	// check if the entire string is less than min
 	if len(v.Input) < v.Min || v.Input == "" {
@@ -64,7 +68,7 @@ func (v *Validate) MinLength() bool {
 
 // IsEmpty checks to see if string is empty
 func (v *Validate) IsEmpty() bool {
-	return strings.TrimSpace(v.Input) == ""
+	return len(strings.TrimSpace(v.Input)) == 0
 }
 
 // clamp a value to a max and min

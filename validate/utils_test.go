@@ -61,7 +61,7 @@ func TestValidate(t *testing.T) {
 
 	assert.False(t, weird.MaxLength(), "Should not be greater than max")
 
-	assert.True(t, weird.MinLength(), "Should be less than min")
+	assert.True(t, weird.MinPartsLength(), "Should be less than min")
 
 	weird2 := Validate{
 		Input: "hello this is long but invalid because of the first two chars",
@@ -71,7 +71,7 @@ func TestValidate(t *testing.T) {
 
 	assert.False(t, weird2.MaxLength(), "Should not be greater than max")
 
-	assert.False(t, weird2.MinLength(), "Should be more than min")
+	assert.False(t, weird2.MinPartsLength(), "Should be more than min")
 
 	assert.Equal(t, weird2.Input, "hello this is long but invalid because of the first two chars", "Should be the same")
 
