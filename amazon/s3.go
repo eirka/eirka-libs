@@ -26,7 +26,7 @@ func (a *Amazon) Save(filepath, filename, mime string, expire bool) (err error) 
 
 	// if we want the file to not be cached
 	if expire {
-		cache = "no-cache, no-store"
+		cache = "must-revalidate"
 	}
 
 	params := &s3manager.UploadInput{
