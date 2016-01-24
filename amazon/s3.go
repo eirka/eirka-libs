@@ -11,7 +11,7 @@ import (
 )
 
 // Upload a file to S3
-func (a *Amazon) Save(filepath, filename, mime string) (err error) {
+func (a *Amazon) Save(filepath, filename, mime string, expire bool) (err error) {
 
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -21,12 +21,20 @@ func (a *Amazon) Save(filepath, filename, mime string) (err error) {
 
 	uploader := s3manager.NewUploader(a.session)
 
+	// default cachecontrol header
+	var cache = "public, max-age=31536000"
+
+	// if we want the file to not be cached
+	if expire {
+		cache = "no-cache, no-store"
+	}
+
 	params := &s3manager.UploadInput{
 		Bucket:               aws.String(config.Settings.Amazon.Bucket),
 		Key:                  aws.String(filename),
 		Body:                 file,
 		ContentType:          aws.String(mime),
-		CacheControl:         aws.String("public, max-age=31536000"),
+		CacheControl:         aws.String(cache),
 		ServerSideEncryption: aws.String(s3.ServerSideEncryptionAes256),
 	}
 
