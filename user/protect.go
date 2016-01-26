@@ -24,6 +24,9 @@ func Protect() gin.HandlerFunc {
 			return
 		}
 
+		// this route was protected
+		c.Set("protected", true)
+
 		c.Next()
 
 	}
