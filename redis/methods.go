@@ -9,16 +9,8 @@ func (c *RedisStore) Get(key string) (result []byte, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
-	raw, err := conn.Do("GET", key)
-	if raw == nil {
-		return nil, ErrCacheMiss
-	}
-	result, err = redis.Bytes(raw, err)
-	if err != nil {
-		return
-	}
+	return redis.Bytes(conn.Do("GET", key))
 
-	return
 }
 
 // HGet will retrieve a hash
@@ -26,16 +18,8 @@ func (c *RedisStore) HGet(key string, value string) (result []byte, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
-	raw, err := conn.Do("HGET", key, value)
-	if raw == nil {
-		return nil, ErrCacheMiss
-	}
-	result, err = redis.Bytes(raw, err)
-	if err != nil {
-		return
-	}
+	return redis.Bytes(conn.Do("HGET", key, value))
 
-	return
 }
 
 // Set will set a single record
@@ -93,16 +77,7 @@ func (c *RedisStore) Incr(key string) (result int, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
-	raw, err := conn.Do("INCR", key)
-	if raw == nil {
-		return 0, ErrCacheMiss
-	}
-	result, err = redis.Int(raw, err)
-	if err != nil {
-		return
-	}
-
-	return
+	return redis.Int(conn.Do("INCR", key))
 }
 
 // will set expire on a redis key
