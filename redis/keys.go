@@ -1,5 +1,9 @@
 package redis
 
+import (
+	"strings"
+)
+
 type RedisKey struct {
 	base       string
 	fieldcount int
