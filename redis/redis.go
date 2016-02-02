@@ -27,7 +27,6 @@ type Redis struct {
 
 // NewRedisCache creates a new pool
 func (r *Redis) NewRedisCache() {
-	var err error
 
 	RedisCache.Pool = &redis.Pool{
 		MaxIdle:     r.MaxIdle,
