@@ -63,7 +63,7 @@ func (r *RedisKey) SetKey(ids ...string) *RedisKey {
 	// set the key to the base if theres no fields
 	if r.fieldcount == 0 {
 		r.key = r.base
-		return
+		return r
 	}
 
 	// create our key
@@ -83,7 +83,8 @@ func (r *RedisKey) SetKey(ids ...string) *RedisKey {
 func (r *RedisKey) Get() (result []byte, err error) {
 
 	if !r.keyset {
-		return errors.New("Key is not set")
+		err = errors.New("Key is not set")
+		return
 	}
 
 	if r.hash {
