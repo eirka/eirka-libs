@@ -41,6 +41,7 @@ func init() {
 // populates the fields in a key and sets the hash id
 func (r *RedisKey) SetKey(ids ...string) {
 
+	// set the key to the base if theres no fields
 	if r.fieldcount == 0 {
 		r.key = r.base
 		return
@@ -81,6 +82,10 @@ func (r *RedisKey) Set(data []byte) (err error) {
 		return
 	}
 
+	// unlock the shared lock
+	RedisCache.Unlock()
+
+	// expire the key if set
 	if r.expire {
 		return RedisCache.Expire(r.key, 600)
 	}
