@@ -1,13 +1,14 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
 type RedisKeyer interface {
 	String() string
-	SetKey(ids ...string)
+	SetKey(ids ...string) *RedisKey
 	Get() (result []byte, err error)
 	Set(data []byte) (err error)
 	Delete() (err error)
@@ -21,6 +22,7 @@ type RedisKey struct {
 	lock       bool
 	key        string
 	hashid     string
+	keyset     bool
 }
 
 var _ = RedisKeyer(&RedisKey{})
@@ -56,7 +58,7 @@ func (r *RedisKey) String() string {
 }
 
 // populates the fields in a key and sets the hash id
-func (r *RedisKey) SetKey(ids ...string) {
+func (r *RedisKey) SetKey(ids ...string) *RedisKey {
 
 	// set the key to the base if theres no fields
 	if r.fieldcount == 0 {
@@ -72,11 +74,17 @@ func (r *RedisKey) SetKey(ids ...string) {
 		r.hashid = strings.Join(ids[r.fieldcount:], "")
 	}
 
-	return
+	r.keyset = true
+
+	return r
 }
 
 // gets a key, automatically handles hash types
 func (r *RedisKey) Get() (result []byte, err error) {
+
+	if !r.keyset {
+		return errors.New("Key is not set")
+	}
 
 	if r.hash {
 		return RedisCache.HGet(r.key, r.hashid)
@@ -89,6 +97,10 @@ func (r *RedisKey) Get() (result []byte, err error) {
 
 // sets a key, handles hash types and expiry
 func (r *RedisKey) Set(data []byte) (err error) {
+
+	if !r.keyset {
+		return errors.New("Key is not set")
+	}
 
 	if r.hash {
 		err = RedisCache.HMSet(r.key, r.hashid, data)
@@ -114,6 +126,11 @@ func (r *RedisKey) Set(data []byte) (err error) {
 
 // deletes a key
 func (r *RedisKey) Delete() (err error) {
+
+	if !r.keyset {
+		return errors.New("Key is not set")
+	}
+
 	err = RedisCache.Delete(r.key)
 	if err != nil {
 		return
