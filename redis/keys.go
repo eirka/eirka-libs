@@ -7,11 +7,12 @@ import (
 )
 
 type RedisKeyer interface {
-	String() string
+	NewKey(name string) *RedisKey
 	SetKey(ids ...string) *RedisKey
 	Get() (result []byte, err error)
 	Set(data []byte) (err error)
 	Delete() (err error)
+	String() string
 }
 
 type RedisKey struct {
@@ -55,6 +56,15 @@ func init() {
 // return a string version of the key
 func (r *RedisKey) String() string {
 	return r.key
+}
+
+// NewKey returns a key from the index or nil if it doesnt exist
+func NewKey(name string) *RedisKey {
+	key, ok := redis.RedisKeyIndex[name]
+	if !ok {
+		return nil
+	}
+	return key
 }
 
 // populates the fields in a key and sets the hash id
