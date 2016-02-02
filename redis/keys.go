@@ -59,11 +59,11 @@ func (r *RedisKey) String() string {
 
 // NewKey returns a key from the index or nil if it doesnt exist
 func NewKey(name string) *RedisKey {
-	key, ok := &RedisKeyIndex[name]
+	key, ok := RedisKeyIndex[name]
 	if !ok {
 		return nil
 	}
-	return key
+	return &key
 }
 
 // populates the fields in a key and sets the hash id
