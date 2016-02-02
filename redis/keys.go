@@ -72,6 +72,7 @@ func (r *RedisKey) SetKey(ids ...string) *RedisKey {
 	// set the key to the base if theres no fields
 	if r.fieldcount == 0 {
 		r.key = r.base
+		r.keyset = true
 		return r
 	}
 
