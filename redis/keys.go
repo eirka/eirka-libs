@@ -5,6 +5,14 @@ import (
 	"strings"
 )
 
+type RedisKeyer interface {
+	String() string
+	SetKey(ids ...string)
+	Get() (result []byte, err error)
+	Set(data []byte) (err error)
+	Delete() (err error)
+}
+
 type RedisKey struct {
 	base       string
 	fieldcount int
@@ -14,6 +22,8 @@ type RedisKey struct {
 	key        string
 	hashid     string
 }
+
+var _ = RedisKeyer(&RedisKey{})
 
 var (
 	RedisKeyIndex = make(map[string]RedisKey)

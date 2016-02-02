@@ -42,8 +42,6 @@ type Pool interface {
 var _ = Pool(&redis.Pool{})
 
 // A Mutex is a mutual exclusion lock.
-//
-// Fields of a Mutex must not be changed after first use.
 type Mutex struct {
 	Expiry time.Duration // Duration for which the lock is valid, DefaultExpiry if 0
 
@@ -60,8 +58,7 @@ type Mutex struct {
 
 var _ = Locker(&Mutex{})
 
-// NewMutexWithGenericPool returns a new Mutex on a named resource connected to the Redis instances at given generic Pools.
-// different from NewMutexWithPool to maintain backwards compatibility
+// NewMuter initializes a new regex on a redis pool
 func NewMutex(genericNodes []Pool) *Mutex {
 	if len(genericNodes) == 0 {
 		panic("no pools given")
@@ -73,12 +70,13 @@ func NewMutex(genericNodes []Pool) *Mutex {
 	}
 }
 
-// Lock locks m.
+// Lock will put a lock key in redis
 // In case it returns an error on failure, you may retry to acquire the lock by calling this method again.
 func (m *Mutex) Lock(key string) error {
 	m.nodem.Lock()
 	defer m.nodem.Unlock()
 
+	// generate random data to place in key
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -86,33 +84,41 @@ func (m *Mutex) Lock(key string) error {
 	}
 	value := base64.StdEncoding.EncodeToString(b)
 
+	// set expiry
 	expiry := m.Expiry
 	if expiry == 0 {
 		expiry = DefaultExpiry
 	}
 
+	// set retries
 	retries := m.Tries
 	if retries == 0 {
 		retries = DefaultTries
 	}
 
+	// loop to try and set lock
 	for i := 0; i < retries; i++ {
 		n := 0
 		start := time.Now()
+
+		// loop through redis pools
 		for _, node := range m.nodes {
 			if node == nil {
 				continue
 			}
 
+			// try and set the key, NX will prevent the key from being overwritten
 			conn := node.Get()
 			reply, err := redis.String(conn.Do("SET", key, value, "NX", "PX", int(expiry/time.Millisecond)))
 			conn.Close()
 			if err != nil {
 				continue
 			}
+
 			if reply != "OK" {
 				continue
 			}
+
 			n++
 		}
 
@@ -121,6 +127,7 @@ func (m *Mutex) Lock(key string) error {
 			factor = DefaultFactor
 		}
 
+		// if the time is past then we will delete the key
 		until := time.Now().Add(expiry - time.Now().Sub(start) - time.Duration(int64(float64(expiry)*factor)) + 2*time.Millisecond)
 		if n >= m.Quorum && time.Now().Before(until) {
 			return nil
@@ -131,6 +138,7 @@ func (m *Mutex) Lock(key string) error {
 				continue
 			}
 
+			// delete the key if it matches our value
 			conn := node.Get()
 			_, err := delScript.Do(conn, key, value)
 			conn.Close()
@@ -149,8 +157,7 @@ func (m *Mutex) Lock(key string) error {
 	return ErrFailed
 }
 
-// Unlock unlocks m.
-// It is a run-time error if m is not locked on entry to Unlock.
+// Unlock will delete the lock key
 // It returns the status of the unlock
 func (m *Mutex) Unlock(key string) bool {
 	m.nodem.Lock()
@@ -162,6 +169,7 @@ func (m *Mutex) Unlock(key string) bool {
 			continue
 		}
 
+		// delete the key
 		conn := node.Get()
 		status, err := conn.Do("DEL", key)
 		conn.Close()
@@ -173,12 +181,15 @@ func (m *Mutex) Unlock(key string) bool {
 		}
 		n++
 	}
+
 	if n >= m.Quorum {
 		return true
 	}
+
 	return false
 }
 
+// checks to see if the key data matches our current lock, and deletes if so
 var delScript = redis.NewScript(1, `
 if redis.call("get", KEYS[1]) == ARGV[1] then
 	return redis.call("del", KEYS[1])

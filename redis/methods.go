@@ -4,6 +4,22 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
+type RedisStorer interface {
+	Lock(key string) error
+	Unlock(key string) bool
+	Get(key string) (result []byte, err error)
+	HGet(key string, value string) (result []byte, err error)
+	Set(key string, result []byte) (err error)
+	SetEx(key string, timeout uint, result []byte) (err error)
+	HMSet(key string, value string, result []byte) (err error)
+	Delete(key ...interface{}) (err error)
+	Flush() (err error)
+	Incr(key string) (result int, err error)
+	Expire(key string, timeout uint) (err error)
+}
+
+var _ = RedisStorer(&RedisStore{})
+
 // lock our shared mutex
 func (c *RedisStore) Lock(key string) error {
 	return c.Mutex.Lock(key)
