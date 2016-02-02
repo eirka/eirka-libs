@@ -10,7 +10,7 @@ import (
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
 	Pool  *redis.Pool
-	Mutex redsync.Mutex
+	Mutex *redsync.Mutex
 }
 
 var (
@@ -48,7 +48,7 @@ func (r *Redis) NewRedisCache() {
 		RedisCache.Pool,
 	})
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	return
