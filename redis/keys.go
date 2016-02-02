@@ -7,7 +7,6 @@ import (
 )
 
 type RedisKeyer interface {
-	NewKey(name string) *RedisKey
 	SetKey(ids ...string) *RedisKey
 	Get() (result []byte, err error)
 	Set(data []byte) (err error)
@@ -60,7 +59,7 @@ func (r *RedisKey) String() string {
 
 // NewKey returns a key from the index or nil if it doesnt exist
 func NewKey(name string) *RedisKey {
-	key, ok := redis.RedisKeyIndex[name]
+	key, ok := RedisKeyIndex[name]
 	if !ok {
 		return nil
 	}
