@@ -113,4 +113,6 @@ func (r *RedisKey) Delete() (err error) {
 	if r.lock {
 		RedisCache.Lock(fmt.Sprintf("%s:mutex", r.key))
 	}
+
+	return
 }
