@@ -3,14 +3,13 @@ package redis
 import (
 	"errors"
 	"github.com/garyburd/redigo/redis"
-	"github.com/hjr265/redsync.go/redsync"
 	"time"
 )
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
 	Pool  *redis.Pool
-	Mutex *redsync.Mutex
+	Mutex *Mutex
 }
 
 var (
@@ -44,12 +43,9 @@ func (r *Redis) NewRedisCache() {
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex, err = redsync.NewMutexWithGenericPool("shared_mutex", []redsync.Pool{
+	RedisCache.Mutex = NewMutex([]redsync.Pool{
 		RedisCache.Pool,
 	})
-	if err != nil {
-		panic(err)
-	}
 
 	return
 }

@@ -5,13 +5,13 @@ import (
 )
 
 // lock our shared mutex
-func (c *RedisStore) Lock() error {
-	return c.Mutex.Lock()
+func (c *RedisStore) Lock(id uint) error {
+	return c.Mutex.Lock(fmt.Sprintf("mutex_%d", id))
 }
 
 // unlock our shared mutex
-func (c *RedisStore) Unlock() bool {
-	return c.Mutex.Unlock()
+func (c *RedisStore) Unlock(id uint) bool {
+	return c.Mutex.Unlock(fmt.Sprintf("mutex_%d", id))
 }
 
 // Get will retrieve a key
