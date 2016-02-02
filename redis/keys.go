@@ -82,9 +82,6 @@ func (r *RedisKey) Set(data []byte) (err error) {
 		return
 	}
 
-	// unlock the shared lock
-	RedisCache.Unlock()
-
 	// expire the key if set
 	if r.expire {
 		return RedisCache.Expire(r.key, 600)
