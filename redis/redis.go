@@ -28,23 +28,28 @@ type Redis struct {
 
 // NewRedisCache creates a new pool
 func (r *Redis) NewRedisCache() {
+	var err error
+
 	RedisCache.Pool = &redis.Pool{
 		MaxIdle:     r.MaxIdle,
 		MaxActive:   r.MaxConnections,
 		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial(r.Protocol, r.Address)
+		Dial: func() (c redis.Conn, err error) {
+			c, err = redis.Dial(r.Protocol, r.Address)
 			if err != nil {
-				return nil, err
+				panic(err)
 			}
-			return c, err
+			return
 		},
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex = redsync.NewMutexWithGenericPool("post_lock", []redsync.Pool{
+	RedisCache.Mutex, err = redsync.NewMutexWithGenericPool("post_lock", []redsync.Pool{
 		RedisCache.Pool,
 	})
+	if err != nil {
+		panic(err)
+	}
 
 	return
 }
