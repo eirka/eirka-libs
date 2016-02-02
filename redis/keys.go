@@ -9,6 +9,7 @@ type RedisKey struct {
 	fieldcount int
 	hash       bool
 	expire     bool
+	lock       bool
 	key        string
 	hashid     string
 }
@@ -16,7 +17,7 @@ type RedisKey struct {
 var (
 	RedisKeyIndex = make(map[string]RedisKey)
 	RedisKeys     = []RedisKey{
-		{base: "index", fieldcount: 1, hash: true, expire: false},
+		{base: "index", fieldcount: 1, hash: true, expire: false, lock: true},
 		{base: "thread", fieldcount: 2, hash: true, expire: false},
 		{base: "tag", fieldcount: 2, hash: true, expire: true},
 		{base: "image", fieldcount: 1, hash: true, expire: false},
@@ -36,6 +37,11 @@ func init() {
 	for _, key := range RedisKeys {
 		RedisKeyIndex[key.base] = key
 	}
+}
+
+// return a string version of the key
+func (r *RedisKey) String() string {
+	return r.key
 }
 
 // populates the fields in a key and sets the hash id
@@ -82,10 +88,28 @@ func (r *RedisKey) Set(data []byte) (err error) {
 		return
 	}
 
+	// unlock this key
+	if r.lock {
+		RedisCache.Unlock(fmt.Sprintf("%s:mutex", r.key))
+	}
+
 	// expire the key if set
 	if r.expire {
 		return RedisCache.Expire(r.key, 600)
 	}
 
 	return
+}
+
+// deletes a key
+func (r *RedisKey) Delete() (err error) {
+	err = RedisCache.Delete(r.key)
+	if err != nil {
+		return
+	}
+
+	// lock this key
+	if r.lock {
+		RedisCache.Lock(fmt.Sprintf("%s:mutex", r.key))
+	}
 }
