@@ -3,12 +3,14 @@ package redis
 import (
 	"errors"
 	"github.com/garyburd/redigo/redis"
+	"github.com/hjr265/redsync.go/redsync"
 	"time"
 )
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
-	Pool *redis.Pool
+	Pool  *redis.Pool
+	Mutex *redsync.Mutex
 }
 
 var (
@@ -38,6 +40,11 @@ func (r *Redis) NewRedisCache() {
 			return c, err
 		},
 	}
+
+	// create our distributed lock
+	RedisCache.Mutex = redsync.NewMutexWithGenericPool("post_lock", []redsync.Pool{
+		RedisCache.Pool,
+	})
 
 	return
 }

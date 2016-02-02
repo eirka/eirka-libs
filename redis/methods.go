@@ -4,6 +4,16 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
+// lock our shared mutex
+func (c *RedisStore) Lock() error {
+	return c.Mutex.Lock()
+}
+
+// unlock our shared mutex
+func (c *RedisStore) Unlock() bool {
+	return c.Mutex.Unlock()
+}
+
 // Get will retrieve a key
 func (c *RedisStore) Get(key string) (result []byte, err error) {
 	conn := c.Pool.Get()
