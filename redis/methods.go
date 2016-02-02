@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 )
 

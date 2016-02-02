@@ -43,7 +43,7 @@ func (r *Redis) NewRedisCache() {
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex = NewMutex([]redsync.Pool{
+	RedisCache.Mutex = NewMutex([]Pool{
 		RedisCache.Pool,
 	})
 

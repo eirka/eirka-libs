@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"net"
 	"sync"
 	"time"
 
@@ -31,8 +30,8 @@ var (
 
 // Locker interface with Lock returning an error when lock cannot be aquired
 type Locker interface {
-	Lock() error
-	Unlock() bool
+	Lock(string) error
+	Unlock(string) bool
 }
 
 // Pool is a generic connection pool
@@ -106,7 +105,7 @@ func (m *Mutex) Lock(key string) error {
 			}
 
 			conn := node.Get()
-			reply, err := redis.String(conn.Do("set", key, value, "nx", "px", int(expiry/time.Millisecond)))
+			reply, err := redis.String(conn.Do("SET", key, value, "NX", "PX", int(expiry/time.Millisecond)))
 			conn.Close()
 			if err != nil {
 				continue
@@ -163,7 +162,7 @@ func (m *Mutex) Unlock(key string) bool {
 		}
 
 		conn := node.Get()
-		status, err := delScript.Do(conn, key)
+		status, err := conn.Do("DEL", conn, key)
 		conn.Close()
 		if err != nil {
 			continue
