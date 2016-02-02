@@ -125,13 +125,14 @@ func (m *Mutex) Lock(key string) error {
 		if n >= m.Quorum && time.Now().Before(until) {
 			return nil
 		}
+
 		for _, node := range m.nodes {
 			if node == nil {
 				continue
 			}
 
 			conn := node.Get()
-			_, err := delScript.Do(conn, key, value)
+			_, err := conn.Do("DEL", key)
 			conn.Close()
 			if err != nil {
 				continue
@@ -162,7 +163,7 @@ func (m *Mutex) Unlock(key string) bool {
 		}
 
 		conn := node.Get()
-		status, err := conn.Do("DEL", conn, key)
+		status, err := conn.Do("DEL", key)
 		conn.Close()
 		if err != nil {
 			continue
