@@ -10,7 +10,7 @@ import (
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
 	Pool  *redis.Pool
-	Mutex *redsync.Mutex
+	Mutex redsync.Mutex
 }
 
 var (
@@ -37,18 +37,18 @@ func (r *Redis) NewRedisCache() {
 		Dial: func() (c redis.Conn, err error) {
 			c, err = redis.Dial(r.Protocol, r.Address)
 			if err != nil {
-				panic(err)
+				return
 			}
 			return
 		},
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex, err = redsync.NewMutexWithGenericPool("post_lock", []redsync.Pool{
+	RedisCache.Mutex, err = redsync.NewMutexWithGenericPool("shared_mutex", []redsync.Pool{
 		RedisCache.Pool,
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	return
