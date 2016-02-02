@@ -132,7 +132,7 @@ func (m *Mutex) Lock(key string) error {
 			}
 
 			conn := node.Get()
-			_, err := conn.Do("DEL", key)
+			_, err := delScript.Do(conn, key, value)
 			conn.Close()
 			if err != nil {
 				continue
@@ -178,3 +178,10 @@ func (m *Mutex) Unlock(key string) bool {
 	}
 	return false
 }
+
+var delScript = redis.NewScript(1, `
+if redis.call("get", KEYS[1]) == ARGV[1] then
+	return redis.call("del", KEYS[1])
+else
+	return 0
+end`)
