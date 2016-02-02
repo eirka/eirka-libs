@@ -89,11 +89,6 @@ func (r *RedisKey) Set(data []byte) (err error) {
 		return
 	}
 
-	// unlock this key
-	if r.lock {
-		RedisCache.Unlock(fmt.Sprintf("%s:mutex", r.key))
-	}
-
 	// expire the key if set
 	if r.expire {
 		return RedisCache.Expire(r.key, 600)
