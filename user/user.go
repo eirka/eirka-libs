@@ -45,6 +45,17 @@ var reservedNameList = map[string]bool{
 	"user":           true,
 }
 
+type Authenticator interface {
+	IsValid() bool
+	IsAuthorized(ib uint) bool
+	SetId(uid uint)
+	SetAuthenticated()
+	Password() (err error)
+	ComparePassword(password string) bool
+	FromName(name string) (err error)
+	CreateToken() (newtoken string, err error)
+}
+
 // user struct
 type User struct {
 	Id              uint
@@ -54,9 +65,11 @@ type User struct {
 	isPasswordValid bool
 }
 
+var _ = Authenticator(&User{})
+
 // create a user struct
-func DefaultUser() User {
-	return User{
+func DefaultUser() *User {
+	return &User{
 		Id:              1,
 		IsAuthenticated: false,
 	}
