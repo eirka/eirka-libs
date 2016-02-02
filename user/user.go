@@ -68,8 +68,8 @@ type User struct {
 var _ = Authenticator(&User{})
 
 // create a user struct
-func DefaultUser() *User {
-	return &User{
+func DefaultUser() User {
+	return User{
 		Id:              1,
 		IsAuthenticated: false,
 	}
