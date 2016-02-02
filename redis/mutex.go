@@ -14,7 +14,7 @@ import (
 
 const (
 	// DefaultExpiry is used when Mutex Duration is 0
-	DefaultExpiry = 4 * time.Second
+	DefaultExpiry = 6 * time.Second
 	// DefaultTries is used when Mutex Duration is 0
 	DefaultTries = 16
 	// DefaultDelay is used when Mutex Delay is 0
