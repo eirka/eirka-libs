@@ -38,22 +38,6 @@ type Config struct {
 		Key    string
 	}
 
-	// settings for google storage
-	Google struct {
-		Auth   string
-		Bucket string
-		Key    string
-	}
-
-	Antispam struct {
-		// Antispam Key from Prim
-		AntispamKey string
-
-		// Antispam cookie
-		CookieName  string
-		CookieValue string
-	}
-
 	Limits struct {
 		// Image settings
 		ImageMinWidth  int
@@ -61,7 +45,16 @@ type Config struct {
 		ImageMaxWidth  int
 		ImageMaxHeight int
 		ImageMaxSize   int
-		WebmMaxLength  int
+
+		// avatar settings
+		AvatarMinWidth  int
+		AvatarMinHeight int
+		AvatarMaxWidth  int
+		AvatarMaxHeight int
+		AvatarMaxSize   int
+
+		// webm settings
+		WebmMaxLength int
 
 		// Max posts in a thread
 		PostsMax uint
@@ -69,12 +62,18 @@ type Config struct {
 		// Lengths for posting
 		CommentMaxLength int
 		CommentMinLength int
-		TitleMaxLength   int
-		TitleMinLength   int
-		NameMaxLength    int
-		NameMinLength    int
-		TagMaxLength     int
-		TagMinLength     int
+
+		TitleMaxLength int
+		TitleMinLength int
+
+		NameMaxLength int
+		NameMinLength int
+
+		TagMaxLength int
+		TagMinLength int
+
+		PasswordMaxLength int
+		PasswordMinLength int
 
 		// Max thumbnail sizes
 		ThumbnailMaxWidth  int

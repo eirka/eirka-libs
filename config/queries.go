@@ -17,21 +17,6 @@ func GetDatabaseSettings() {
 	}
 	defer ps.Close()
 
-	err = ps.QueryRow("antispam_key").Scan(&Settings.Antispam.AntispamKey)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ps.QueryRow("antispam_cookiename").Scan(&Settings.Antispam.CookieName)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ps.QueryRow("antispam_cookievalue").Scan(&Settings.Antispam.CookieValue)
-	if err != nil {
-		panic(err)
-	}
-
 	err = ps.QueryRow("image_minwidth").Scan(&Settings.Limits.ImageMinWidth)
 	if err != nil {
 		panic(err)
@@ -167,21 +152,6 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
-	err = ps.QueryRow("google_auth").Scan(&Settings.Google.Auth)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ps.QueryRow("google_bucket").Scan(&Settings.Google.Bucket)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ps.QueryRow("google_key").Scan(&Settings.Google.Key)
-	if err != nil {
-		panic(err)
-	}
-
 	err = ps.QueryRow("thread_postsperpage").Scan(&Settings.Limits.PostsPerPage)
 	if err != nil {
 		panic(err)
@@ -203,6 +173,41 @@ func GetDatabaseSettings() {
 	}
 
 	err = ps.QueryRow("prim_css").Scan(&Settings.Prim.Css)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("avatar_minwidth").Scan(&Settings.Limits.AvatarMinWidth)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("avatar_minheight").Scan(&Settings.Limits.AvatarMinHeight)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("avatar_maxwidth").Scan(&Settings.Limits.AvatarMaxWidth)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("avatar_maxheight").Scan(&Settings.Limits.AvatarMaxHeight)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("avatar_maxsize").Scan(&Settings.Limits.AvatarMaxSize)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("password_maxlength").Scan(&Settings.Limits.PasswordMaxLength)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("password_minlength").Scan(&Settings.Limits.PasswordMinLength)
 	if err != nil {
 		panic(err)
 	}
