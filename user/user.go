@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 )
@@ -326,9 +327,15 @@ func (u *User) ComparePassword(password string) bool {
 // hash a given password
 func HashPassword(password string) (hash []byte, err error) {
 
-	// password length cant be 0
+	// check that password has correct lengths
 	if len(password) == 0 {
-		err = e.ErrInvalidPassword
+		err = e.ErrPasswordEmpty
+		return
+	} else if len(password) < config.Settings.Limits.PasswordMinLength {
+		err = e.ErrPasswordShort
+		return
+	} else if len(password) > config.Settings.Limits.PasswordMaxLength {
+		err = e.ErrPasswordLong
 		return
 	}
 
