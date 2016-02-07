@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
+	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 
@@ -124,12 +125,12 @@ func TestPassword(t *testing.T) {
 		assert.Equal(t, err, e.ErrPasswordEmpty, "Error should match")
 	}
 
-	_, err := HashPassword("heh")
+	_, err = HashPassword("heh")
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrPasswordShort, "Error should match")
 	}
 
-	_, err := HashPassword("k8dyuCqJfW9v5iFUeeS4YOeiuk5Wee6Q9tZvWFHqE10ftzhaxVzxlKzx4n7CcBpRcgtaX9dZ2lBIRrsvgqXPPvmjNpIgnrums2Xtst8FsZkpZo61u3ChCs7MEO1DGy4Qa")
+	_, err = HashPassword("k8dyuCqJfW9v5iFUeeS4YOeiuk5Wee6Q9tZvWFHqE10ftzhaxVzxlKzx4n7CcBpRcgtaX9dZ2lBIRrsvgqXPPvmjNpIgnrums2Xtst8FsZkpZo61u3ChCs7MEO1DGy4Qa")
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrPasswordLong, "Error should match")
 	}

@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 
 	local "github.com/eirka/eirka-post/config"
