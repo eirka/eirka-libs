@@ -3,13 +3,16 @@ package user
 import (
 	"bytes"
 	"fmt"
-	"github.com/eirka/eirka-libs/db"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/eirka/eirka-libs/db"
+
+	local "github.com/eirka/eirka-post/config"
 )
 
 func init() {

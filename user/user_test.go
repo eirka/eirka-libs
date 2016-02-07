@@ -1,10 +1,13 @@
 package user
 
 import (
-	"github.com/eirka/eirka-libs/db"
-	e "github.com/eirka/eirka-libs/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/eirka/eirka-libs/db"
+	e "github.com/eirka/eirka-libs/errors"
+
+	local "github.com/eirka/eirka-post/config"
 )
 
 func init() {
