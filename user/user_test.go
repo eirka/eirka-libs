@@ -1,10 +1,32 @@
 package user
 
 import (
+	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func init() {
+
+	// Database connection settings
+	dbase := db.Database{
+
+		User:           local.Settings.Database.User,
+		Password:       local.Settings.Database.Password,
+		Proto:          local.Settings.Database.Proto,
+		Host:           local.Settings.Database.Host,
+		Database:       local.Settings.Database.Database,
+		MaxIdle:        local.Settings.Database.MaxIdle,
+		MaxConnections: local.Settings.Database.MaxConnections,
+	}
+
+	// Set up DB connection
+	dbase.NewDb()
+
+	// Get limits and stuff from database
+	config.GetDatabaseSettings()
+}
 
 func TestDefaultUser(t *testing.T) {
 
@@ -96,7 +118,17 @@ func TestPassword(t *testing.T) {
 
 	_, err := HashPassword("")
 	if assert.Error(t, err, "An error was expected") {
-		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
+		assert.Equal(t, err, e.ErrPasswordEmpty, "Error should match")
+	}
+
+	_, err := HashPassword("heh")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrPasswordShort, "Error should match")
+	}
+
+	_, err := HashPassword("k8dyuCqJfW9v5iFUeeS4YOeiuk5Wee6Q9tZvWFHqE10ftzhaxVzxlKzx4n7CcBpRcgtaX9dZ2lBIRrsvgqXPPvmjNpIgnrums2Xtst8FsZkpZo61u3ChCs7MEO1DGy4Qa")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrPasswordLong, "Error should match")
 	}
 
 	password, err := HashPassword("testpassword")
