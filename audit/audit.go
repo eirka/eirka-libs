@@ -54,14 +54,8 @@ func (a *Audit) Submit() (err error) {
 		return
 	}
 
-	// Insert data into audit table
-	ps, err := dbase.Prepare("INSERT INTO audit (user_id,ib_id,audit_ip,audit_time,audit_action,audit_info) VALUES (?,?,?,NOW(),?,?)")
-	if err != nil {
-		return
-	}
-	defer ps.Close()
-
-	_, err = ps.Exec(a.User, a.Ib, a.Ip, a.Action, a.Info)
+	_, err = dbase.Exec("INSERT INTO audit (user_id,ib_id,audit_ip,audit_time,audit_action,audit_info) VALUES (?,?,?,NOW(),?,?)",
+		a.User, a.Ib, a.Ip, a.Action, a.Info)
 	if err != nil {
 		return
 	}
