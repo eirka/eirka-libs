@@ -4,16 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/gin-gonic/gin"
 	"runtime"
-	"strings"
 	"time"
+
+	e "github.com/eirka/eirka-libs/errors"
 )
 
 var (
 	startTime = time.Now()
 )
 
-var sys struct {
+var Statistics struct {
 	Uptime       string
 	NumGoroutine int
 
@@ -58,7 +60,7 @@ func StatusController(c *gin.Context) {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
 
-	stats := &sys{
+	stats := &Statistics{
 		Uptime:       humanize.Time(startTime),
 		NumGoroutine: runtime.NumGoroutine(),
 		MemAllocated: humanize.Bytes(m.Alloc),
