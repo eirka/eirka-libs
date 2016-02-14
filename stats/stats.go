@@ -1,4 +1,4 @@
-package stats
+package status
 
 import (
 	"encoding/json"
@@ -92,7 +92,7 @@ func StatusController(c *gin.Context) {
 	}
 
 	// Marshal the structs into JSON
-	output, err := json.Marshal(stats)
+	output, err := json.MarshalIndent(stats, "", "  ")
 	if err != nil {
 		c.JSON(e.ErrorMessage(e.ErrInternalError))
 		c.Error(err).SetMeta("StatusController.Marshal")
