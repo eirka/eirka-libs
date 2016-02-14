@@ -15,7 +15,7 @@ var (
 	startTime = time.Now()
 )
 
-var Statistics struct {
+type Statistics struct {
 	Uptime       string
 	NumGoroutine int
 
