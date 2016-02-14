@@ -94,7 +94,6 @@ func StatusController(c *gin.Context) {
 	// Marshal the structs into JSON
 	output, err := json.Marshal(stats)
 	if err != nil {
-		c.Set("controllerError", true)
 		c.JSON(e.ErrorMessage(e.ErrInternalError))
 		c.Error(err).SetMeta("StatusController.Marshal")
 		return
