@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
 	"runtime"
@@ -12,7 +13,7 @@ var (
 	startTime = time.Now()
 )
 
-var sysStatus struct {
+var sys struct {
 	Uptime       string
 	NumGoroutine int
 
@@ -53,40 +54,52 @@ var sysStatus struct {
 	NumGC        uint32
 }
 
-func updateSystemStatus() {
-	sysStatus.Uptime = humanize.Time(startTime)
-
+func StatusController(c *gin.Context) {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
-	sysStatus.NumGoroutine = runtime.NumGoroutine()
 
-	sysStatus.MemAllocated = humanize.Bytes(m.Alloc)
-	sysStatus.MemTotal = humanize.Bytes(m.TotalAlloc)
-	sysStatus.MemSys = humanize.Bytes(m.Sys)
-	sysStatus.Lookups = m.Lookups
-	sysStatus.MemMallocs = m.Mallocs
-	sysStatus.MemFrees = m.Frees
+	stats := &sys{
+		Uptime:       humanize.Time(startTime),
+		NumGoroutine: runtime.NumGoroutine(),
+		MemAllocated: humanize.Bytes(m.Alloc),
+		MemTotal:     humanize.Bytes(m.TotalAlloc),
+		MemSys:       humanize.Bytes(m.Sys),
+		Lookups:      m.Lookups,
+		MemMallocs:   m.Mallocs,
+		MemFrees:     m.Frees,
+		HeapAlloc:    humanize.Bytes(m.HeapAlloc),
+		HeapSys:      humanize.Bytes(m.HeapSys),
+		HeapIdle:     humanize.Bytes(m.HeapIdle),
+		HeapInuse:    humanize.Bytes(m.HeapInuse),
+		HeapReleased: humanize.Bytes(m.HeapReleased),
+		HeapObjects:  m.HeapObjects,
+		StackInuse:   humanize.Bytes(m.StackInuse),
+		StackSys:     humanize.Bytes(m.StackSys),
+		MSpanInuse:   humanize.Bytes(m.MSpanInuse),
+		MSpanSys:     humanize.Bytes(m.MSpanSys),
+		MCacheInuse:  humanize.Bytes(m.MCacheInuse),
+		MCacheSys:    humanize.Bytes(m.MCacheSys),
+		BuckHashSys:  humanize.Bytes(m.BuckHashSys),
+		GCSys:        humanize.Bytes(m.GCSys),
+		OtherSys:     humanize.Bytes(m.OtherSys),
+		NextGC:       humanize.Bytes(m.NextGC),
+		LastGC:       fmt.Sprintf("%.1fs", float64(time.Now().UnixNano()-int64(m.LastGC))/1000/1000/1000),
+		PauseTotalNs: fmt.Sprintf("%.1fs", float64(m.PauseTotalNs)/1000/1000/1000),
+		PauseNs:      fmt.Sprintf("%.3fs", float64(m.PauseNs[(m.NumGC+255)%256])/1000/1000/1000),
+		NumGC:        m.NumGC,
+	}
 
-	sysStatus.HeapAlloc = humanize.Bytes(m.HeapAlloc)
-	sysStatus.HeapSys = humanize.Bytes(m.HeapSys)
-	sysStatus.HeapIdle = humanize.Bytes(m.HeapIdle)
-	sysStatus.HeapInuse = humanize.Bytes(m.HeapInuse)
-	sysStatus.HeapReleased = humanize.Bytes(m.HeapReleased)
-	sysStatus.HeapObjects = m.HeapObjects
+	// Marshal the structs into JSON
+	output, err := json.Marshal(stats)
+	if err != nil {
+		c.Set("controllerError", true)
+		c.JSON(e.ErrorMessage(e.ErrInternalError))
+		c.Error(err).SetMeta("StatusController.Marshal")
+		return
+	}
 
-	sysStatus.StackInuse = humanize.Bytes(m.StackInuse)
-	sysStatus.StackSys = humanize.Bytes(m.StackSys)
-	sysStatus.MSpanInuse = humanize.Bytes(m.MSpanInuse)
-	sysStatus.MSpanSys = humanize.Bytes(m.MSpanSys)
-	sysStatus.MCacheInuse = humanize.Bytes(m.MCacheInuse)
-	sysStatus.MCacheSys = humanize.Bytes(m.MCacheSys)
-	sysStatus.BuckHashSys = humanize.Bytes(m.BuckHashSys)
-	sysStatus.GCSys = humanize.Bytes(m.GCSys)
-	sysStatus.OtherSys = humanize.Bytes(m.OtherSys)
+	c.Data(200, "application/json", output)
 
-	sysStatus.NextGC = humanize.Bytes(m.NextGC)
-	sysStatus.LastGC = fmt.Sprintf("%.1fs", float64(time.Now().UnixNano()-int64(m.LastGC))/1000/1000/1000)
-	sysStatus.PauseTotalNs = fmt.Sprintf("%.1fs", float64(m.PauseTotalNs)/1000/1000/1000)
-	sysStatus.PauseNs = fmt.Sprintf("%.3fs", float64(m.PauseNs[(m.NumGC+255)%256])/1000/1000/1000)
-	sysStatus.NumGC = m.NumGC
+	return
+
 }
