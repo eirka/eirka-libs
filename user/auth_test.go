@@ -107,7 +107,7 @@ func TestAuthSecret(t *testing.T) {
 
 	token, err := user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotEmpty(t, badtoken, "token should be returned")
+		assert.NotEmpty(t, token, "token should be returned")
 	}
 
 	third := performJwtHeaderRequest(router, "GET", "/", token)
