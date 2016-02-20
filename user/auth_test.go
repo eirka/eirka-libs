@@ -68,6 +68,8 @@ func performJwtFormRequest(r http.Handler, method, path, token string) *httptest
 
 func TestAuthSecret(t *testing.T) {
 
+	var err error
+
 	Secret = ""
 
 	gin.SetMode(gin.ReleaseMode)
@@ -96,7 +98,7 @@ func TestAuthSecret(t *testing.T) {
 	user.SetId(2)
 	user.SetAuthenticated()
 
-	user.hash, err := HashPassword("testpassword")
+	user.hash, err = HashPassword("testpassword")
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotNil(t, user.hash, "password should be returned")
 	}
