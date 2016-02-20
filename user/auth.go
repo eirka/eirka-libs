@@ -75,7 +75,10 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		}
 
 		// check if user needed to be authenticated
-		if user.IsAuthenticated != authenticated {
+		// this needs to be like this for routes that dont need auth
+		// if we just check equality then logged in users wont be able
+		// to view anon pages ;P
+		if authenticated && !user.IsAuthenticated {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(e.ErrUnauthorized).SetMeta("user.Auth")
 			c.Abort()

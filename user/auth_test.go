@@ -92,6 +92,26 @@ func TestAuthSecret(t *testing.T) {
 
 	assert.Equal(t, second.Code, 200, "HTTP request code should match")
 
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	user.hash, err = HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, user.hash, "password should be returned")
+	}
+
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+
+	badtoken, err := user.CreateToken()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotEmpty(t, badtoken, "token should be returned")
+	}
+
+	third := performJwtHeaderRequest(router, "GET", "/", goodtoken)
+
+	assert.Equal(t, third.Code, 200, "HTTP request code should match")
+
 }
 
 func TestAuthHeaderToken(t *testing.T) {
