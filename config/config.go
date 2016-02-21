@@ -15,8 +15,15 @@ type Config struct {
 	}
 
 	Prim struct {
+		// Assets for Prim
 		Css string
 		Js  string
+	}
+
+	CloudFlare struct {
+		// CloudFlare API settings
+		Key   string
+		Email string
 	}
 
 	Akismet struct {
@@ -30,8 +37,8 @@ type Config struct {
 		Confidence float64
 	}
 
-	// settings for amazon s3
 	Amazon struct {
+		// Settings for Amazon S3
 		Region string
 		Bucket string
 		Id     string

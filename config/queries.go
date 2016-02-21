@@ -212,6 +212,16 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
+	err = ps.QueryRow("cloudflare_email").Scan(&Settings.CloudFlare.Email)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("cloudflare_key").Scan(&Settings.CloudFlare.Key)
+	if err != nil {
+		panic(err)
+	}
+
 	return
 
 }
