@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
 
 	"github.com/eirka/eirka-libs/config"
@@ -252,7 +253,7 @@ func TestUserPassword(t *testing.T) {
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
 
-	rows := NewRows([]string{"name", "password"}).AddRow("testaccount", password)
+	rows := sqlmock.NewRows([]string{"name", "password"}).AddRow("testaccount", password)
 
 	mock.ExpectQuery("SELECT FROM users").WillReturnRows(rows)
 
