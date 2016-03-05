@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/eirka/eirka-libs/config"
-	//"github.com/eirka/eirka-libs/db"
+	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 )
 
@@ -234,4 +234,30 @@ func TestCreateTokenZeroNoAuth(t *testing.T) {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 		assert.Empty(t, notoken, "token should not be returned")
 	}
+}
+
+func TestUserPassword(t *testing.T) {
+
+	Secret = "secret"
+
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	password, err := HashPassword("testpassword")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, password, "password should be returned")
+	}
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	rows := NewRows([]string{"name", "password"}).AddRow("testaccount", password)
+
+	mock.ExpectQuery("SELECT FROM users").WillReturnRows(rows)
+
+	assert.NoError(t, user.Password(), "An error was not expected")
+
+	assert.NoError(t, db.CloseDb(), "An error was not expected")
+
 }
