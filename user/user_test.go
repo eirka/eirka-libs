@@ -259,6 +259,6 @@ func TestUserPassword(t *testing.T) {
 
 	assert.NoError(t, user.Password(), "An error was not expected")
 
-	assert.NoError(t, db.CloseDb(), "An error was not expected")
+	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 
 }
