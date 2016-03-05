@@ -5,10 +5,8 @@ import (
 	"testing"
 
 	"github.com/eirka/eirka-libs/config"
-	"github.com/eirka/eirka-libs/db"
+	//"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
-
-	local "github.com/eirka/eirka-post/config"
 )
 
 func init() {
