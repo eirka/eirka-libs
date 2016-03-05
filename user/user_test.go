@@ -255,7 +255,7 @@ func TestUserPassword(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"name", "password"}).AddRow("testaccount", password)
 
-	mock.ExpectQuery("SELECT FROM users").WillReturnRows(rows)
+	mock.ExpectQuery("select user_name, user_password from users where user_id").WillReturnRows(rows)
 
 	assert.NoError(t, user.Password(), "An error was not expected")
 
