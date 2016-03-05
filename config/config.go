@@ -1,12 +1,6 @@
 package config
 
-var Settings *Config
-
-func init() {
-
-	Settings = &Config{}
-
-}
+var Settings = new(Config)
 
 type Config struct {
 	General struct {

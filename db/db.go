@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 var db *sql.DB
@@ -34,13 +35,23 @@ func (d *Database) NewDb() {
 		panic(err)
 	}
 
+	// set max open connections
+	db.SetMaxOpenConns(d.MaxConnections)
+	// set max idle connections
+	db.SetMaxIdleConns(d.MaxIdle)
+
+	// try connecting to the database
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
 
-	db.SetMaxIdleConns(d.MaxIdle)
-	db.SetMaxOpenConns(d.MaxConnections)
+}
+
+// get a database mock for testing
+func NewTestDb() (mock sqlmock.Sqlmock, err error) {
+	db, mock, err = sqlmock.New()
+	return
 }
 
 // CloseDb closes the connection to MySQL
@@ -55,10 +66,5 @@ func GetDb() (*sql.DB, error) {
 
 // GetTransaction will return a transaction
 func GetTransaction() (*sql.Tx, error) {
-	tx, err := db.Begin()
-	if err != nil {
-		panic(err)
-	}
-
-	return tx, err
+	return db.Begin()
 }
