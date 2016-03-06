@@ -363,7 +363,7 @@ func TestCheckDuplicateGood(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
 
-	mock.ExpectQuery("select count(*) from users where user_name").WillReturnRows(rows)
+	mock.ExpectQuery(`select count(\*) from users where user_name`).WillReturnRows(rows)
 
 	assert.False(t, CheckDuplicate("test"), "Should not be a duplicate")
 
@@ -376,7 +376,7 @@ func TestCheckDuplicateBad(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"count"}).AddRow(1)
 
-	mock.ExpectQuery("select count(*) from users where user_name").WillReturnRows(rows)
+	mock.ExpectQuery(`select count(\*) from users where user_name`).WillReturnRows(rows)
 
 	assert.True(t, CheckDuplicate("test"), "Should be a duplicate")
 
