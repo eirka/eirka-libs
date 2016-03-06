@@ -1,7 +1,7 @@
 package config
 
 // Initialize settings with some sane defaults
-var Settings = new(Config{
+var Settings = &Config{
 	General: General{
 		GuestPosting:     true,
 		AutoRegistration: true,
@@ -46,7 +46,7 @@ var Settings = new(Config{
 		PostsPerThread:     5,
 		ParamMaxSize:       1000000,
 	},
-})
+}
 
 // Config holds the main configuration data
 type Config struct {
