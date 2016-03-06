@@ -19,10 +19,6 @@ func TestProtect(t *testing.T) {
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
 
-	rows := sqlmock.NewRows([]string{"role"}).AddRow(1)
-
-	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
-
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
@@ -56,8 +52,20 @@ func TestProtect(t *testing.T) {
 		assert.NotEmpty(t, token, "token should be returned")
 	}
 
+	firstrows := sqlmock.NewRows([]string{"role"}).AddRow(1)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(firstrows)
+
 	second := performJwtHeaderRequest(router, "GET", "/important/1", token)
 
-	assert.Equal(t, second.Code, 200, "HTTP request code should match")
+	assert.Equal(t, second.Code, 403, "HTTP request code should match")
+
+	secondrows := sqlmock.NewRows([]string{"role"}).AddRow(3)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(secondrows)
+
+	third := performJwtHeaderRequest(router, "GET", "/important/1", token)
+
+	assert.Equal(t, third.Code, 200, "HTTP request code should match")
 
 }
