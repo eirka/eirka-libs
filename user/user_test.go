@@ -257,12 +257,11 @@ func TestUserPassword(t *testing.T) {
 
 	mock.ExpectQuery("select user_name, user_password from users where user_id").WillReturnRows(rows)
 
-	assert.NoError(t, user.Password(), "An error was not expected")
-
-	assert.Equal(t, user.Name, "testaccount", "Name should match")
-
-	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
-
+	err = user.Password()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.Equal(t, user.Name, "testaccount", "Name should match")
+		assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+	}
 }
 
 func TestUserBadPassword(t *testing.T) {
@@ -285,12 +284,11 @@ func TestUserBadPassword(t *testing.T) {
 
 	mock.ExpectQuery("select user_name, user_password from users where user_id").WillReturnRows(rows)
 
-	assert.NoError(t, user.Password(), "An error was not expected")
-
-	assert.Equal(t, user.Name, "testaccount", "Name should match")
-
-	assert.False(t, user.ComparePassword("badpassword"), "Password should not validate")
-
+	err = user.Password()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.Equal(t, user.Name, "testaccount", "Name should match")
+		assert.False(t, user.ComparePassword("badpassword"), "Password should not validate")
+	}
 }
 
 func TestFromName(t *testing.T) {
@@ -311,13 +309,12 @@ func TestFromName(t *testing.T) {
 
 	mock.ExpectQuery("select user_id, user_password from users where user_name").WillReturnRows(rows)
 
-	assert.NoError(t, user.FromName("testaccount"), "An error was not expected")
-
-	assert.Equal(t, user.Id, uint(2), "Id should match")
-
-	assert.True(t, user.IsAuthenticated, "User should be authenticated")
-
-	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+	err = user.FromName("testaccount")
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.Equal(t, user.Id, uint(2), "Id should match")
+		assert.True(t, user.IsAuthenticated, "User should be authenticated")
+		assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
+	}
 
 }
 
