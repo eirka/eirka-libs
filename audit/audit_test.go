@@ -37,6 +37,8 @@ func TestAudit(t *testing.T) {
 
 func TestAuditInvalid(t *testing.T) {
 
+	var err error
+
 	audit := Audit{
 		User:   0,
 		Ib:     1,
