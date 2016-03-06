@@ -392,6 +392,18 @@ func TestIsAuthorizedDefault(t *testing.T) {
 
 	user := DefaultUser()
 
+	assert.False(t, user.IsAuthorized(0), "Should not be authorized")
+
+	user.SetAuthenticated()
+
+	assert.False(t, user.IsAuthorized(0), "Should not be authorized")
+
+}
+
+func TestIsAuthorizedDefault(t *testing.T) {
+
+	user := DefaultUser()
+
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
 
@@ -400,5 +412,56 @@ func TestIsAuthorizedDefault(t *testing.T) {
 	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
 
 	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
+}
+
+func TestIsAuthorizedAuth(t *testing.T) {
+
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	rows := sqlmock.NewRows([]string{"role"}).AddRow(2)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
+
+	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
+}
+
+func TestIsAuthorizedMod(t *testing.T) {
+
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	rows := sqlmock.NewRows([]string{"role"}).AddRow(3)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
+
+	assert.True(t, user.IsAuthorized(1), "Should be authorized")
+
+}
+
+func TestIsAuthorizedAdmin(t *testing.T) {
+
+	user := DefaultUser()
+	user.SetId(2)
+	user.SetAuthenticated()
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	rows := sqlmock.NewRows([]string{"role"}).AddRow(4)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
+
+	assert.True(t, user.IsAuthorized(1), "Should be authorized")
 
 }
