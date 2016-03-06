@@ -36,7 +36,7 @@ func TestProtect(t *testing.T) {
 		return
 	})
 
-	first := performRequest(router, "GET", "/important")
+	first := performRequest(router, "GET", "/important/1")
 
 	assert.Equal(t, first.Code, 401, "HTTP request code should match")
 
@@ -56,7 +56,7 @@ func TestProtect(t *testing.T) {
 		assert.NotEmpty(t, token, "token should be returned")
 	}
 
-	second := performJwtHeaderRequest(router, "GET", "/important", token)
+	second := performJwtHeaderRequest(router, "GET", "/important/1", token)
 
 	assert.Equal(t, second.Code, 200, "HTTP request code should match")
 
