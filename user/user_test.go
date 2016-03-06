@@ -356,6 +356,12 @@ func TestFromNameBadId(t *testing.T) {
 
 }
 
+func TestCheckDuplicateEmpty(t *testing.T) {
+
+	assert.True(t, CheckDuplicate(""), "Should return true")
+
+}
+
 func TestCheckDuplicateGood(t *testing.T) {
 
 	mock, err := db.NewTestDb()
