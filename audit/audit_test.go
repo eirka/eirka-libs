@@ -15,8 +15,6 @@ func TestAudit(t *testing.T) {
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
 
-	rows := sqlmock.NewRows([]string{"role"}).AddRow(3)
-
 	mock.ExpectPrepare(`INSERT INTO audit \(user_id,ib_id,audit_type,audit_ip,audit_time,audit_action,audit_info\)`).
 		ExpectExec().
 		WithArgs(1, 1, UserLog, "10.0.0.1", "NOW()", AuditEmailUpdate, "meta info")
