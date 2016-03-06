@@ -387,3 +387,18 @@ func TestCheckDuplicateBad(t *testing.T) {
 	assert.True(t, CheckDuplicate("test"), "Should be a duplicate")
 
 }
+
+func TestIsAuthorizedDefault(t *testing.T) {
+
+	user := DefaultUser()
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	rows := sqlmock.NewRows([]string{"role"}).AddRow(1)
+
+	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
+
+	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
+}
