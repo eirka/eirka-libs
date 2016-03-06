@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
@@ -371,8 +370,6 @@ func TestCheckDuplicateGood(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
 
 	mock.ExpectQuery(`select count\(\*\) from users where user_name`).WillReturnRows(rows)
-
-	fmt.Println(CheckDuplicate("test"))
 
 	assert.False(t, CheckDuplicate("test"), "Should not be a duplicate")
 
