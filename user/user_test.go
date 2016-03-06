@@ -327,7 +327,8 @@ func TestFromNameEmptyName(t *testing.T) {
 
 	user := DefaultUser()
 
-	if assert.Error(t, user.FromName(""), "An error was expected") {
+	err := user.FromName("")
+	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 	}
 
@@ -351,7 +352,8 @@ func TestFromNameBadId(t *testing.T) {
 
 	mock.ExpectQuery("select user_id, user_password from users where user_name").WillReturnRows(rows)
 
-	if assert.Error(t, user.FromName("testaccount"), "An error was expected") {
+	err = user.FromName("test")
+	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 	}
 
