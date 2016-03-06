@@ -327,7 +327,9 @@ func TestFromNameEmptyName(t *testing.T) {
 
 	user := DefaultUser()
 
-	assert.Error(t, user.FromName(""), "An error was expected")
+	if assert.Error(t, user.FromName(""), "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+	}
 
 }
 
@@ -345,10 +347,12 @@ func TestFromNameBadId(t *testing.T) {
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
 
-	rows := sqlmock.NewRows([]string{"id", "password"}).AddRow(1, password)
+	rows := sqlmock.NewRows([]string{"id", "password"}).AddRow(0, password)
 
 	mock.ExpectQuery("select user_id, user_password from users where user_name").WillReturnRows(rows)
 
-	assert.Error(t, user.FromName("testaccount"), "An error was expected")
+	if assert.Error(t, user.FromName("testaccount"), "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+	}
 
 }
