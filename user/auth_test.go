@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/eirka/eirka-libs/config"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {

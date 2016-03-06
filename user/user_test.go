@@ -5,7 +5,6 @@ import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
 
-	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 )
