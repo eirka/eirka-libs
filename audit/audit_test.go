@@ -2,7 +2,6 @@ package audit
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
 
 	"github.com/eirka/eirka-libs/db"
