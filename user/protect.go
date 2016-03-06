@@ -7,6 +7,7 @@ import (
 )
 
 // Protect will check to see if a user has the correct permissions
+// A route protected by this middleware needs an ib parameter
 func Protect() gin.HandlerFunc {
 	return func(c *gin.Context) {
 

@@ -31,7 +31,7 @@ func TestProtect(t *testing.T) {
 	router.Use(Auth(true))
 	router.Use(Protect())
 
-	router.GET("/important", func(c *gin.Context) {
+	router.GET("/important/:ib", func(c *gin.Context) {
 		c.String(200, "OK")
 		return
 	})
