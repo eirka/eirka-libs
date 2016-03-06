@@ -365,7 +365,7 @@ func TestCheckDuplicateGood(t *testing.T) {
 
 	mock.ExpectQuery("select count(*) from users where user_name").WillReturnRows(rows)
 
-	assert.False(t, CheckDuplicate(), "Should not be a duplicate")
+	assert.False(t, CheckDuplicate("test"), "Should not be a duplicate")
 
 }
 
@@ -378,6 +378,6 @@ func TestCheckDuplicateBad(t *testing.T) {
 
 	mock.ExpectQuery("select count(*) from users where user_name").WillReturnRows(rows)
 
-	assert.True(t, CheckDuplicate(), "Should be a duplicate")
+	assert.True(t, CheckDuplicate("test"), "Should be a duplicate")
 
 }
