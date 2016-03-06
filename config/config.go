@@ -1,93 +1,150 @@
 package config
 
-var Settings = new(Config)
+// Initialize settings with some sane defaults
+var Settings = new(Config{
+	General: General{
+		GuestPosting:     true,
+		AutoRegistration: true,
+	},
+	Prim: Prim{
+		Css: "prim.css",
+		Js:  "prim.js",
+	},
+	CloudFlare: CloudFlare{},
+	Akismet:    Akismet{},
+	StopForumSpam: StopForumSpam{
+		Confidence: 40,
+	},
+	Amazon: Amazon{},
+	Limits: Limits{
+		ImageMinWidth:      100,
+		ImageMinHeight:     100,
+		ImageMaxWidth:      20000,
+		ImageMaxHeight:     20000,
+		ImageMaxSize:       20000000,
+		AvatarMinWidth:     100,
+		AvatarMinHeight:    100,
+		AvatarMaxWidth:     1000,
+		AvatarMaxHeight:    1000,
+		AvatarMaxSize:      1000000,
+		WebmMaxLength:      300,
+		PostsMax:           800,
+		CommentMaxLength:   1000,
+		CommentMinLength:   3,
+		TitleMaxLength:     40,
+		TitleMinLength:     3,
+		NameMaxLength:      20,
+		NameMinLength:      3,
+		TagMaxLength:       128,
+		TagMinLength:       3,
+		PasswordMaxLength:  128,
+		PasswordMinLength:  8,
+		ThumbnailMaxWidth:  200,
+		ThumbnailMaxHeight: 300,
+		PostsPerPage:       40,
+		ThreadsPerPage:     10,
+		PostsPerThread:     5,
+		ParamMaxSize:       1000000,
+	},
+})
 
+// Config holds the main configuration data
 type Config struct {
-	General struct {
-		GuestPosting     bool
-		AutoRegistration bool
-	}
+	General       General
+	Prim          Prim
+	CloudFlare    CloudFlare
+	Akismet       Akismet
+	StopForumSpam StopForumSpam
+	Amazon        Amazon
+	Limits        Limits
+}
 
-	Prim struct {
-		// Assets for Prim
-		Css string
-		Js  string
-	}
+// General options
+type General struct {
+	GuestPosting     bool
+	AutoRegistration bool
+}
 
-	CloudFlare struct {
-		// CloudFlare API settings
-		Key   string
-		Email string
-	}
+// Assets for Prim
+type Prim struct {
+	Css string
+	Js  string
+}
 
-	Akismet struct {
-		// Akismet settings
-		Key  string
-		Host string
-	}
+// CloudFlare API settings
+type CloudFlare struct {
+	Key   string
+	Email string
+}
 
-	StopForumSpam struct {
-		// Stop Forum Spam settings
-		Confidence float64
-	}
+// Akismet settings
+type Akismet struct {
+	Key  string
+	Host string
+}
 
-	Amazon struct {
-		// Settings for Amazon S3
-		Region string
-		Bucket string
-		Id     string
-		Key    string
-	}
+// Stop Forum Spam settings
+type StopForumSpam struct {
+	Confidence float64
+}
 
-	Limits struct {
-		// Image settings
-		ImageMinWidth  int
-		ImageMinHeight int
-		ImageMaxWidth  int
-		ImageMaxHeight int
-		ImageMaxSize   int
+// Settings for Amazon
+type Amazon struct {
+	Region string
+	Bucket string
+	Id     string
+	Key    string
+}
 
-		// avatar settings
-		AvatarMinWidth  int
-		AvatarMinHeight int
-		AvatarMaxWidth  int
-		AvatarMaxHeight int
-		AvatarMaxSize   int
+// Limits for various items
+type Limits struct {
+	// Image settings
+	ImageMinWidth  int
+	ImageMinHeight int
+	ImageMaxWidth  int
+	ImageMaxHeight int
+	ImageMaxSize   int
 
-		// webm settings
-		WebmMaxLength int
+	// avatar settings
+	AvatarMinWidth  int
+	AvatarMinHeight int
+	AvatarMaxWidth  int
+	AvatarMaxHeight int
+	AvatarMaxSize   int
 
-		// Max posts in a thread
-		PostsMax uint
+	// webm settings
+	WebmMaxLength int
 
-		// Lengths for posting
-		CommentMaxLength int
-		CommentMinLength int
+	// Max posts in a thread
+	PostsMax uint
 
-		TitleMaxLength int
-		TitleMinLength int
+	// Lengths for posting
+	CommentMaxLength int
+	CommentMinLength int
 
-		NameMaxLength int
-		NameMinLength int
+	TitleMaxLength int
+	TitleMinLength int
 
-		TagMaxLength int
-		TagMinLength int
+	NameMaxLength int
+	NameMinLength int
 
-		PasswordMaxLength int
-		PasswordMinLength int
+	TagMaxLength int
+	TagMinLength int
 
-		// Max thumbnail sizes
-		ThumbnailMaxWidth  int
-		ThumbnailMaxHeight int
+	PasswordMaxLength int
+	PasswordMinLength int
 
-		// Set default posts per page
-		PostsPerPage uint
-		// Set default threads per index page
-		ThreadsPerPage uint
-		// Add one to number because first post is included
-		PostsPerThread uint
+	// Max thumbnail sizes
+	ThumbnailMaxWidth  int
+	ThumbnailMaxHeight int
 
-		// Max request parameter input size
-		ParamMaxSize uint
-	}
+	// Set default posts per page
+	PostsPerPage uint
+	// Set default threads per index page
+	ThreadsPerPage uint
+	// Add one to number because first post is included
+	PostsPerThread uint
+
+	// Max request parameter input size
+	ParamMaxSize uint
 }
