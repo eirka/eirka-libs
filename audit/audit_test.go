@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/eirka/eirka-libs/db"
-	e "github.com/eirka/eirka-libs/errors"
 )
 
 func TestAudit(t *testing.T) {
