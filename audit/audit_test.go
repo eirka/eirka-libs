@@ -15,7 +15,7 @@ func TestAudit(t *testing.T) {
 	assert.NoError(t, err, "An error was not expected")
 
 	mock.ExpectExec(`INSERT INTO audit \(user_id,ib_id,audit_type,audit_ip,audit_time,audit_action,audit_info\)`).
-		WithArgs(1, 1, UserLog, "10.0.0.1", "NOW()", AuditEmailUpdate, "meta info")
+		WithArgs(1, 1, UserLog, "10.0.0.1", AuditEmailUpdate, "meta info")
 
 	audit := Audit{
 		User:   1,
