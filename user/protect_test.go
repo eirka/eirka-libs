@@ -58,4 +58,6 @@ func TestProtect(t *testing.T) {
 
 	second := performJwtHeaderRequest(router, "GET", "/important", token)
 
+	assert.Equal(t, second.Code, 200, "HTTP request code should match")
+
 }
