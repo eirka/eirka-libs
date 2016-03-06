@@ -388,7 +388,7 @@ func TestCheckDuplicateBad(t *testing.T) {
 
 }
 
-func TestIsAuthorizedDefault(t *testing.T) {
+func TestIsAuthorizedInvalid(t *testing.T) {
 
 	user := DefaultUser()
 
