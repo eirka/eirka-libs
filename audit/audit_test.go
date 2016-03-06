@@ -1,6 +1,7 @@
 package audit
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
@@ -31,5 +32,24 @@ func TestAudit(t *testing.T) {
 	// submit audit
 	err = audit.Submit()
 	assert.NoError(t, err, "An error was not expected")
+
+}
+
+func TestAuditInvalid(t *testing.T) {
+
+	audit := Audit{
+		User:   0,
+		Ib:     1,
+		Type:   UserLog,
+		Ip:     "10.0.0.1",
+		Action: AuditEmailUpdate,
+		Info:   "meta info",
+	}
+
+	// submit audit
+	err = audit.Submit()
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, errors.New("Audit not valid"), "Error should match")
+	}
 
 }
