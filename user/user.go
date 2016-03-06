@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
@@ -188,14 +189,18 @@ func CheckDuplicate(name string) (check bool) {
 	// Get Database handle
 	dbase, err := db.GetDb()
 	if err != nil {
+		fmt.Println(err)
 		return true
 	}
 
 	// this will return true if there is a user
 	err = dbase.QueryRow("select count(*) from users where user_name = ?", name).Scan(&check)
 	if err != nil {
+		fmt.Println(err)
 		return true
 	}
+
+	fmt.Println(check)
 
 	return
 
