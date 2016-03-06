@@ -313,7 +313,9 @@ func TestFromName(t *testing.T) {
 
 	assert.NoError(t, user.FromName("testaccount"), "An error was not expected")
 
-	assert.Equal(t, user.Id, 2, "Id should match")
+	assert.Equal(t, user.Id, uint(2), "Id should match")
+
+	assert.True(t, user.IsAuthenticated, "User should be authenticated")
 
 	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 
