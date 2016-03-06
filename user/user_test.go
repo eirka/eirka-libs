@@ -394,9 +394,15 @@ func TestIsAuthorizedInvalid(t *testing.T) {
 
 	assert.False(t, user.IsAuthorized(0), "Should not be authorized")
 
+	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
 	user.SetAuthenticated()
 
-	assert.False(t, user.IsAuthorized(0), "Should not be authorized")
+	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
+	user.SetId(2)
+
+	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
 
 }
 
