@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/eirka/eirka-libs/db"
-	e "github.com/eirka/eirka-libs/errors"
+	"github.com/eirka/eirka-libs/validate"
 )
 
 func TestProtect(t *testing.T) {
@@ -28,8 +28,8 @@ func TestProtect(t *testing.T) {
 	router := gin.New()
 
 	router.Use(validate.ValidateParams())
-	router.Use(user.Auth(true))
-	router.Use(user.Protect())
+	router.Use(Auth(true))
+	router.Use(Protect())
 
 	router.GET("/important", func(c *gin.Context) {
 		c.String(200, "OK")
@@ -53,7 +53,7 @@ func TestProtect(t *testing.T) {
 
 	token, err := user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotEmpty(t, badtoken, "token should be returned")
+		assert.NotEmpty(t, token, "token should be returned")
 	}
 
 	second := performJwtHeaderRequest(router, "GET", "/important", token)
