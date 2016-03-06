@@ -11,31 +11,7 @@ import (
 	"testing"
 
 	"github.com/eirka/eirka-libs/config"
-	"github.com/eirka/eirka-libs/db"
-
-	local "github.com/eirka/eirka-post/config"
 )
-
-func init() {
-
-	// Database connection settings
-	dbase := db.Database{
-
-		User:           local.Settings.Database.User,
-		Password:       local.Settings.Database.Password,
-		Proto:          local.Settings.Database.Proto,
-		Host:           local.Settings.Database.Host,
-		Database:       local.Settings.Database.Database,
-		MaxIdle:        local.Settings.Database.MaxIdle,
-		MaxConnections: local.Settings.Database.MaxConnections,
-	}
-
-	// Set up DB connection
-	dbase.NewDb()
-
-	// Get limits and stuff from database
-	config.GetDatabaseSettings()
-}
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, path, nil)

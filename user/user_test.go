@@ -10,11 +10,6 @@ import (
 	e "github.com/eirka/eirka-libs/errors"
 )
 
-func init() {
-	config.Settings.Limits.PasswordMinLength = 8
-	config.Settings.Limits.PasswordMaxLength = 128
-}
-
 func TestDefaultUser(t *testing.T) {
 
 	user := DefaultUser()
