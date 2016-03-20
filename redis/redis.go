@@ -50,13 +50,19 @@ func (r *Redis) NewRedisCache() {
 	return
 }
 
+type RedisPoolMock struct {
+	Conn *redis.Conn
+}
+
+func (r *RedisPoolMock) Get() redis.Conn {
+	return r.Conn
+}
+
 // NewRedisMock returns a fake redis pool for testing
 func NewRedisMock() {
 
-	RedisCache.Pool = &redis.Pool{
-		Dial: func() (c redis.Conn, err error) {
-			return redigomock.NewConn(), nil
-		},
+	RedisCache.Pool = &RedisPoolMock{
+		Conn: redigomock.NewConn(),
 	}
 
 	// create our distributed lock
