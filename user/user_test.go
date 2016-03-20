@@ -263,6 +263,9 @@ func TestUserPassword(t *testing.T) {
 		assert.Equal(t, user.Name, "testaccount", "Name should match")
 		assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 	}
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestUserBadPassword(t *testing.T) {
@@ -290,6 +293,9 @@ func TestUserBadPassword(t *testing.T) {
 		assert.Equal(t, user.Name, "testaccount", "Name should match")
 		assert.False(t, user.ComparePassword("badpassword"), "Password should not validate")
 	}
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestFromName(t *testing.T) {
@@ -316,6 +322,8 @@ func TestFromName(t *testing.T) {
 		assert.True(t, user.IsAuthenticated, "User should be authenticated")
 		assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 	}
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
 }
 
@@ -355,6 +363,8 @@ func TestFromNameBadId(t *testing.T) {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 	}
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestCheckDuplicateEmpty(t *testing.T) {
@@ -374,6 +384,8 @@ func TestCheckDuplicateGood(t *testing.T) {
 
 	assert.False(t, CheckDuplicate("test"), "Should not be a duplicate")
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestCheckDuplicateBad(t *testing.T) {
@@ -386,6 +398,8 @@ func TestCheckDuplicateBad(t *testing.T) {
 	mock.ExpectQuery(`select count\(\*\) from users where user_name`).WillReturnRows(rows)
 
 	assert.True(t, CheckDuplicate("test"), "Should be a duplicate")
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
 }
 
@@ -420,6 +434,8 @@ func TestIsAuthorizedDefault(t *testing.T) {
 
 	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestIsAuthorizedAuth(t *testing.T) {
@@ -436,6 +452,8 @@ func TestIsAuthorizedAuth(t *testing.T) {
 	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
 
 	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
 }
 
@@ -454,6 +472,8 @@ func TestIsAuthorizedMod(t *testing.T) {
 
 	assert.True(t, user.IsAuthorized(1), "Should be authorized")
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestIsAuthorizedAdmin(t *testing.T) {
@@ -470,5 +490,7 @@ func TestIsAuthorizedAdmin(t *testing.T) {
 	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(rows)
 
 	assert.True(t, user.IsAuthorized(1), "Should be authorized")
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
 }

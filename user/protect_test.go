@@ -68,4 +68,6 @@ func TestProtect(t *testing.T) {
 
 	assert.Equal(t, third.Code, 200, "HTTP request code should match")
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }

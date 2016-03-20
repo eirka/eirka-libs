@@ -33,6 +33,8 @@ func TestAudit(t *testing.T) {
 	err = audit.Submit()
 	assert.NoError(t, err, "An error was not expected")
 
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
 }
 
 func TestAuditInvalid(t *testing.T) {
