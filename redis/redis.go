@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"github.com/garyburd/redigo/redis"
+	"github.com/rafaeljusto/redigomock"
 	"time"
 )
 
@@ -38,6 +39,23 @@ func (r *Redis) NewRedisCache() {
 				return
 			}
 			return
+		},
+	}
+
+	// create our distributed lock
+	RedisCache.Mutex = NewMutex([]Pool{
+		RedisCache.Pool,
+	})
+
+	return
+}
+
+// NewRedisMock returns a fake redis pool for testing
+func (r *Redis) NewRedisMock() {
+
+	RedisCache.Pool = &redis.Pool{
+		Dial: func() (c redis.Conn, err error) {
+			return redigomock.NewConn(), nil
 		},
 	}
 
