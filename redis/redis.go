@@ -51,7 +51,7 @@ func (r *Redis) NewRedisCache() {
 }
 
 type RedisPoolMock struct {
-	Conn *redis.Conn
+	Conn *redigomock.Conn
 }
 
 func (r *RedisPoolMock) Get() redis.Conn {
