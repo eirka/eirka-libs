@@ -64,9 +64,6 @@ func NewRedisMock() {
 	conn := redigomock.NewConn()
 
 	RedisCache.Pool = &redis.Pool{
-		MaxIdle:     r.MaxIdle,
-		MaxActive:   r.MaxConnections,
-		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
 			return conn, nil
 		},
