@@ -2,6 +2,7 @@ package redis
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"github.com/rafaeljusto/redigomock"
 )
 
 type RedisStorer interface {
@@ -20,9 +21,13 @@ type RedisStorer interface {
 
 var _ = RedisStorer(&RedisStore{})
 
-// return a connection
-func (c *RedisStore) Conn() redis.Conn {
-	return c.Pool.Get()
+// mock command
+func (c *RedisStore) MockCommand(command, fields ...string) {
+	conn := c.Pool.Get()
+	defer conn.Close()
+
+	return conn.Command(command, fields...)
+
 }
 
 // lock our shared mutex
