@@ -22,12 +22,8 @@ type RedisStorer interface {
 var _ = RedisStorer(&RedisStore{})
 
 // mock command
-func (c *RedisStore) MockCommand(command, fields ...string) {
-	conn := c.Pool.Get()
-	defer conn.Close()
-
-	return conn.Command(command, fields...)
-
+func (c *RedisStore) MockCommand(command string, fields ...string) {
+	c.Pool.Conn.Command(command, fields...)
 }
 
 // lock our shared mutex
