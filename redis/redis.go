@@ -7,9 +7,14 @@ import (
 	"time"
 )
 
+// Pool is a generic connection pool
 type Pool interface {
 	Get() redis.Conn
+	Close() error
 }
+
+var _ = Pool(&redis.Pool{})
+var _ = Pool(&RedisPoolMock{})
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {

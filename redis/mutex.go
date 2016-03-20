@@ -34,13 +34,6 @@ type Locker interface {
 	Unlock(string) bool
 }
 
-// Pool is a generic connection pool
-type Pool interface {
-	Get() redis.Conn
-}
-
-var _ = Pool(&redis.Pool{})
-
 // A Mutex is a mutual exclusion lock.
 type Mutex struct {
 	Expiry time.Duration // Duration for which the lock is valid, DefaultExpiry if 0
