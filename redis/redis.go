@@ -19,6 +19,7 @@ var _ = Pool(&redis.Pool{})
 type RedisStore struct {
 	Pool  Pool
 	Mutex *Mutex
+	Mock  *redigomock.Conn
 }
 
 var (
@@ -61,11 +62,11 @@ func (r *Redis) NewRedisCache() {
 // NewRedisMock returns a fake redis pool for testing
 func NewRedisMock() {
 
-	conn := redigomock.NewConn()
+	RedisCache.Mock = redigomock.NewConn()
 
 	RedisCache.Pool = &redis.Pool{
 		Dial: func() (redis.Conn, error) {
-			return conn, nil
+			return RedisCache.Mock, nil
 		},
 	}
 
