@@ -7,9 +7,13 @@ import (
 	"time"
 )
 
+type Pool interface {
+	Get() redis.Conn
+}
+
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
-	Pool  *redis.Pool
+	Pool  *Pool
 	Mutex *Mutex
 }
 
@@ -56,6 +60,10 @@ type RedisPoolMock struct {
 
 func (r *RedisPoolMock) Get() redis.Conn {
 	return r.Conn
+}
+
+func (r *RedisPoolMock) Close() error {
+	return nil
 }
 
 // NewRedisMock returns a fake redis pool for testing
