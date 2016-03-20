@@ -20,6 +20,11 @@ type RedisStorer interface {
 
 var _ = RedisStorer(&RedisStore{})
 
+// return a connection
+func (c *RedisStore) Conn() redis.Conn {
+	return c.Pool.Get()
+}
+
 // lock our shared mutex
 func (c *RedisStore) Lock(key string) error {
 	return c.Mutex.Lock(key)
