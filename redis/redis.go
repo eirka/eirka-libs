@@ -67,6 +67,10 @@ func (r *RedisPoolMock) Get() redis.Conn {
 	return r.Conn
 }
 
+func (r *RedisPoolMock) GetMock() redigomock.Conn {
+	return r.Conn
+}
+
 func (r *RedisPoolMock) Close() error {
 	return nil
 }

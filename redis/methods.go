@@ -22,7 +22,7 @@ var _ = RedisStorer(&RedisStore{})
 
 // mock command
 func (c *RedisStore) MockCommand(command string, fields ...string) {
-	conn := c.Pool.Conn()
+	conn := c.Pool.GetMock()
 
 	conn.Command(command, fields...)
 }
