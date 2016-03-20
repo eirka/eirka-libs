@@ -18,7 +18,7 @@ var _ = Pool(&RedisPoolMock{})
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
-	Pool  *Pool
+	Pool  Pool
 	Mutex *Mutex
 }
 
