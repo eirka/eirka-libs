@@ -14,7 +14,6 @@ type Pool interface {
 }
 
 var _ = Pool(&redis.Pool{})
-var _ = Pool(&RedisPoolMock{})
 
 // RedisStore holds a handle to the Redis pool
 type RedisStore struct {
@@ -59,27 +58,18 @@ func (r *Redis) NewRedisCache() {
 	return
 }
 
-type RedisPoolMock struct {
-	Conn *redigomock.Conn
-}
-
-func (r *RedisPoolMock) Get() redis.Conn {
-	return r.Conn
-}
-
-func (r *RedisPoolMock) GetMock() *redigomock.Conn {
-	return r.Conn
-}
-
-func (r *RedisPoolMock) Close() error {
-	return nil
-}
-
 // NewRedisMock returns a fake redis pool for testing
 func NewRedisMock() {
 
-	RedisCache.Pool = &RedisPoolMock{
-		Conn: redigomock.NewConn(),
+	conn := redigomock.NewConn()
+
+	RedisCache.Pool = &redis.Pool{
+		MaxIdle:     r.MaxIdle,
+		MaxActive:   r.MaxConnections,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return conn, nil
+		},
 	}
 
 	// create our distributed lock
