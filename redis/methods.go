@@ -21,7 +21,7 @@ type RedisStorer interface {
 var _ = RedisStorer(&RedisStore{})
 
 // mock command
-func (c *RedisStore) MockCommand(command string, fields ...string) {
+func (c *RedisStore) MockCommand(command string, fields ...interface{}) {
 	c.Mock.Command(command, fields...)
 }
 
