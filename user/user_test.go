@@ -73,25 +73,32 @@ func TestIsValid(t *testing.T) {
 
 func TestIsValidName(t *testing.T) {
 
-	assert.True(t, IsValidName("cooldude2"), "Name should validate")
+	badnames := []string{
+		"cool.dude",
+		"cooldude!",
+		"admin",
+		"Admin",
+		"Admin  ",
+		"  Admin  ",
+		"Mod",
+	}
 
-	assert.True(t, IsValidName("cool dude"), "Name should validate")
+	for _, name := range badnames {
+		assert.False(t, IsValidName(name), "Name should not validate")
+	}
 
-	assert.True(t, IsValidName("cool_dude"), "Name should validate")
+	goodnames := []string{
+		"cooldude2",
+		"cooldude",
+		"cool dude",
+		"cool-dude",
+		"way cool dude",
+		"way-cool-dude69",
+	}
 
-	assert.True(t, IsValidName("cool-dude"), "Name should validate")
-
-	assert.False(t, IsValidName("cool.dude"), "Name should not validate")
-
-	assert.False(t, IsValidName("cooldude!"), "Name should not validate")
-
-	assert.False(t, IsValidName("admin"), "Name should not validate")
-
-	assert.False(t, IsValidName("Admin"), "Name should not validate")
-
-	assert.False(t, IsValidName("Admin "), "Name should not validate")
-
-	assert.False(t, IsValidName(" Admin  "), "Name should not validate")
+	for _, name := range goodnames {
+		assert.True(t, IsValidName(name), "Name should validate")
+	}
 
 }
 
