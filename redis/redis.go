@@ -51,7 +51,7 @@ func (r *Redis) NewRedisCache() {
 }
 
 // NewRedisMock returns a fake redis pool for testing
-func (r *Redis) NewRedisMock() {
+func NewRedisMock() {
 
 	RedisCache.Pool = &redis.Pool{
 		Dial: func() (c redis.Conn, err error) {
