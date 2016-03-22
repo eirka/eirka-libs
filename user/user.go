@@ -344,11 +344,18 @@ func HashPassword(password string) (hash []byte, err error) {
 	}
 
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
 }
 
 // generate random password for password resets
 func RandomPassword() (password string, hash []byte, err error) {
-	return generateRandomPassword(20), HashPassword(password)
+
+	password = generateRandomPassword(20)
+
+	hash, err = HashPassword(password)
+
+	return
+
 }
 
 // will generate a password with random characters
@@ -366,4 +373,5 @@ func generateRandomPassword(n int) string {
 	}
 
 	return string(b)
+
 }
