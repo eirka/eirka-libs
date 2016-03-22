@@ -555,7 +555,7 @@ func TestUpdatePasswordNoHash(t *testing.T) {
 
 	var err error
 
-	err = UpdatePassword([]byte{}, 2)
+	err = UpdatePassword(nil, 2)
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
 	}
