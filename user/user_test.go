@@ -156,18 +156,20 @@ func TestGeneratePassword(t *testing.T) {
 
 func TestRandomPassword(t *testing.T) {
 
-	password, hash, err := RandomPassword()
-	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotNil(t, hash, "hash should be returned")
-		assert.NotEmpty(t, password, "password should be returned")
+	for i := 1; i <= 10; i++ {
+		password, hash, err := RandomPassword()
+		if assert.NoError(t, err, "An error was not expected") {
+			assert.NotNil(t, hash, "hash should be returned")
+			assert.NotEmpty(t, password, "password should be returned")
+		}
+
+		user := DefaultUser()
+		user.SetId(2)
+		user.SetAuthenticated()
+		user.hash = hash
+
+		assert.True(t, user.ComparePassword(password), "Password should validate")
 	}
-
-	user := DefaultUser()
-	user.SetId(2)
-	user.SetAuthenticated()
-	user.hash = hash
-
-	assert.True(t, user.ComparePassword(password), "Password should validate")
 
 }
 
