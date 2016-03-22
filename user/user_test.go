@@ -551,7 +551,7 @@ func TestUpdatePassword(t *testing.T) {
 
 }
 
-func TestUpdatePasswordNilHash(t *testing.T) {
+func TestUpdatePasswordBadHash(t *testing.T) {
 
 	var err error
 
@@ -559,12 +559,6 @@ func TestUpdatePasswordNilHash(t *testing.T) {
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
 	}
-
-}
-
-func TestUpdatePasswordEmptyHash(t *testing.T) {
-
-	var err error
 
 	err = UpdatePassword([]byte{}, 2)
 	if assert.Error(t, err, "An error was expected") {
