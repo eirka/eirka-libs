@@ -535,7 +535,6 @@ func TestUpdatePassword(t *testing.T) {
 	_, hash, err := RandomPassword()
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotNil(t, hash, "hash should be returned")
-		assert.NotEmpty(t, password, "password should be returned")
 	}
 
 	mock, err := db.NewTestDb()
@@ -570,7 +569,6 @@ func TestUpdatePasswordBadUser(t *testing.T) {
 	_, hash, err := RandomPassword()
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotNil(t, hash, "hash should be returned")
-		assert.NotEmpty(t, password, "password should be returned")
 	}
 
 	err = UpdatePassword(hash, 1)
