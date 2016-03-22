@@ -347,13 +347,8 @@ func HashPassword(password string) (hash []byte, err error) {
 }
 
 // generate random password for password resets
-func RandomPassword() (hash []byte, password string, err error) {
-
-	// create a random password
-	password := generateRandomPassword(20)
-
-	return HashPassword(password)
-
+func RandomPassword() (password string, hash []byte, err error) {
+	return generateRandomPassword(20), HashPassword(password)
 }
 
 // will generate a password with random characters

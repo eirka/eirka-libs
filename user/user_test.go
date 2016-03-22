@@ -2,7 +2,6 @@ package user
 
 import (
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
 
@@ -157,7 +156,7 @@ func TestGeneratePassword(t *testing.T) {
 
 func TestRandomPassword(t *testing.T) {
 
-	hash, password, err := RandomPassword()
+	password, hash, err := RandomPassword()
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotNil(t, hash, "hash should be returned")
 		assert.NotEmpty(t, password, "password should be returned")
