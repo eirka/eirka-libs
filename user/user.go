@@ -392,7 +392,7 @@ func UpdatePassword(hash []byte, uid uint) (err error) {
 	// Get Database handle
 	dbase, err := db.GetDb()
 	if err != nil {
-		return true
+		return
 	}
 
 	_, err = dbase.Exec("UPDATE users SET user_password = ? WHERE user_id = ?", hash, uid)
