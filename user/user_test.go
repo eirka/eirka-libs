@@ -527,3 +527,55 @@ func TestIsAuthorizedAdmin(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
 }
+
+func TestUpdatePassword(t *testing.T) {
+
+	var err error
+
+	_, hash, err := RandomPassword()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, hash, "hash should be returned")
+		assert.NotEmpty(t, password, "password should be returned")
+	}
+
+	mock, err := db.NewTestDb()
+	assert.NoError(t, err, "An error was not expected")
+
+	mock.ExpectExec("UPDATE users SET user_password").
+		WithArgs(hash, 2).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = UpdatePassword(hash, 2)
+	assert.NoError(t, err, "An error was not expected")
+
+	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
+}
+
+func TestUpdatePasswordNoHash(t *testing.T) {
+
+	var err error
+
+	err = UpdatePassword([]byte{}, 2)
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrInvalidPassword, "Error should match")
+	}
+
+}
+
+func TestUpdatePasswordBadUser(t *testing.T) {
+
+	var err error
+
+	_, hash, err := RandomPassword()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, hash, "hash should be returned")
+		assert.NotEmpty(t, password, "password should be returned")
+	}
+
+	err = UpdatePassword(hash, 1)
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
+	}
+
+}

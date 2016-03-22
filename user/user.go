@@ -154,7 +154,7 @@ func (u *User) Password() (err error) {
 // will get the password and user id from the database for a user name
 func (u *User) FromName(name string) (err error) {
 
-	// password length cant be 0
+	// name cant be empty
 	if len(name) == 0 {
 		return e.ErrUserNotValid
 	}
@@ -184,7 +184,7 @@ func (u *User) FromName(name string) (err error) {
 // check for duplicate name before registering
 func CheckDuplicate(name string) (check bool) {
 
-	// password length cant be 0
+	// name cant be empty
 	if len(name) == 0 {
 		return true
 	}
@@ -373,5 +373,33 @@ func generateRandomPassword(n int) string {
 	}
 
 	return string(b)
+
+}
+
+// update the user password hash in database
+func UpdatePassword(hash []byte, uid uint) (err error) {
+
+	// name cant be empty
+	if uid == 0 || uid == 1 {
+		return e.ErrUserNotValid
+	}
+
+	// hash cant be empty
+	if hash == nil {
+		return e.ErrInvalidPassword
+	}
+
+	// Get Database handle
+	dbase, err := db.GetDb()
+	if err != nil {
+		return true
+	}
+
+	_, err = dbase.Exec("UPDATE users SET user_password = ? WHERE user_id = ?", hash, uid)
+	if err != nil {
+		return
+	}
+
+	return
 
 }
