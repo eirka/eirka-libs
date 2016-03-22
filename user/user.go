@@ -385,7 +385,7 @@ func UpdatePassword(hash []byte, uid uint) (err error) {
 	}
 
 	// hash cant be empty
-	if hash == nil {
+	if hash == nil || len(hash) == 0 {
 		return e.ErrInvalidPassword
 	}
 
