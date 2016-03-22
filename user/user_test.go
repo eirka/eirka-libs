@@ -140,6 +140,26 @@ func TestPassword(t *testing.T) {
 
 }
 
+func TestRandomPassword(t *testing.T) {
+
+	password, err := RandomPassword()
+	if assert.NoError(t, err, "An error was not expected") {
+		assert.NotNil(t, password, "password should be returned")
+	}
+
+}
+
+func TestGeneratePassword(t *testing.T) {
+
+	password1 := generateRandomPassword(20)
+	password2 := generateRandomPassword(20)
+
+	assert.True(t, len(password1) == 20, "Password should be 20 chars")
+	assert.True(t, len(password2) == 20, "Password should be 20 chars")
+	assert.NotEqual(t, password1, password2, "Passwords should not be equal")
+
+}
+
 func TestCreateToken(t *testing.T) {
 
 	Secret = ""

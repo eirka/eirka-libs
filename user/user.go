@@ -3,6 +3,7 @@ package user
 import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
+	"math/rand"
 	"regexp"
 	"strings"
 	"time"
@@ -26,6 +27,9 @@ const (
 
 	// the username validation regex
 	username = `^([a-zA-Z0-9]+[\s_-]?)+$`
+
+	// characters for random password generator
+	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 )
 
 var regexUsername = regexp.MustCompile(username)
@@ -340,4 +344,31 @@ func HashPassword(password string) (hash []byte, err error) {
 	}
 
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+}
+
+// generate random password for password resets
+func RandomPassword() (hash []byte, err error) {
+
+	// create a random password
+	password := generateRandomPassword(20)
+
+	return HashPassword(password)
+
+}
+
+// will generate a password with random characters
+func generateRandomPassword(n int) string {
+
+	// random source
+	src := rand.NewSource(time.Now().UnixNano())
+
+	// byte slice to hold password
+	b := make([]byte, n)
+
+	// range over byte slice and fill with random letters
+	for i := range b {
+		b[i] = letterBytes[src.Int63()%int64(len(letterBytes))]
+	}
+
+	return string(b)
 }
