@@ -151,12 +151,15 @@ func TestRandomPassword(t *testing.T) {
 
 func TestGeneratePassword(t *testing.T) {
 
-	password1 := generateRandomPassword(20)
-	password2 := generateRandomPassword(20)
+	password := generateRandomPassword(20)
 
-	assert.True(t, len(password1) == 20, "Password should be 20 chars")
-	assert.True(t, len(password2) == 20, "Password should be 20 chars")
-	assert.NotEqual(t, password1, password2, "Passwords should not be equal")
+	assert.True(t, len(password) == 20, "Password should be 20 chars")
+
+	for i := 1; i <= 1000; i++ {
+		password1 := generateRandomPassword(20)
+		password2 := generateRandomPassword(20)
+		assert.NotEqual(t, password1, password2, "Passwords should not be equal")
+	}
 
 }
 
