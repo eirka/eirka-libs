@@ -37,6 +37,7 @@ var (
 	AuditSpam            = "Spam Reported"
 	AuditRegister        = "Account Registered"
 	AuditChangePassword  = "Password Changed"
+	AuditResetPassword   = "Password Reset"
 	AuditEmailUpdate     = "Email Updated"
 	AuditFavoriteRemoved = "Favorite Removed"
 	AuditFavoriteAdded   = "Favorite Added"
