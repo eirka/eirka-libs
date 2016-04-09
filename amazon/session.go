@@ -8,11 +8,12 @@ import (
 	"github.com/eirka/eirka-libs/config"
 )
 
+// Amazon holds the session
 type Amazon struct {
 	session *session.Session
 }
 
-// create aws session with credentials
+// New will create aws session with credentials
 func New() (amazon *Amazon) {
 
 	// new credentials from settings

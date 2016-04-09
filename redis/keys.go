@@ -6,15 +6,17 @@ import (
 	"strings"
 )
 
-type RedisKeyer interface {
-	SetKey(ids ...string) *RedisKey
+// Keyer describes the explicit key functions
+type Keyer interface {
+	SetKey(ids ...string) *Key
 	Get() (result []byte, err error)
 	Set(data []byte) (err error)
 	Delete() (err error)
 	String() string
 }
 
-type RedisKey struct {
+// Key holds an explicit keys data
+type Key struct {
 	base       string
 	fieldcount int
 	hash       bool
@@ -25,11 +27,13 @@ type RedisKey struct {
 	keyset     bool
 }
 
-var _ = RedisKeyer(&RedisKey{})
+var _ = Keyer(&Key{})
 
 var (
-	RedisKeyIndex = make(map[string]RedisKey)
-	RedisKeys     = []RedisKey{
+	// RedisKeyIndex holds a searchable index of keys
+	RedisKeyIndex = make(map[string]Key)
+	// RedisKeys is a slice of all the explicit keys
+	RedisKeys = []Key{
 		{base: "index", fieldcount: 1, hash: true, expire: false, lock: true},
 		{base: "thread", fieldcount: 2, hash: true, expire: false},
 		{base: "tag", fieldcount: 2, hash: true, expire: true},
@@ -53,12 +57,12 @@ func init() {
 }
 
 // return a string version of the key
-func (r *RedisKey) String() string {
+func (r *Key) String() string {
 	return r.key
 }
 
 // NewKey returns a key from the index or nil if it doesnt exist
-func NewKey(name string) *RedisKey {
+func NewKey(name string) *Key {
 	key, ok := RedisKeyIndex[name]
 	if !ok {
 		return nil
@@ -66,8 +70,8 @@ func NewKey(name string) *RedisKey {
 	return &key
 }
 
-// populates the fields in a key and sets the hash id
-func (r *RedisKey) SetKey(ids ...string) *RedisKey {
+// SetKey populates the fields in a key and sets the hash id
+func (r *Key) SetKey(ids ...string) *Key {
 
 	// set the key to the base if theres no fields
 	if r.fieldcount == 0 {
@@ -89,8 +93,8 @@ func (r *RedisKey) SetKey(ids ...string) *RedisKey {
 	return r
 }
 
-// gets a key, automatically handles hash types
-func (r *RedisKey) Get() (result []byte, err error) {
+// Get gets a key, automatically handles hash types
+func (r *Key) Get() (result []byte, err error) {
 
 	if !r.keyset {
 		err = errors.New("Key is not set")
@@ -98,25 +102,24 @@ func (r *RedisKey) Get() (result []byte, err error) {
 	}
 
 	if r.hash {
-		return RedisCache.HGet(r.key, r.hashid)
-	} else {
-		return RedisCache.Get(r.key)
+		return Cache.HGet(r.key, r.hashid)
 	}
 
-	return
+	return Cache.Get(r.key)
+
 }
 
-// sets a key, handles hash types and expiry
-func (r *RedisKey) Set(data []byte) (err error) {
+// Set sets a key, handles hash types and expiry
+func (r *Key) Set(data []byte) (err error) {
 
 	if !r.keyset {
 		return errors.New("Key is not set")
 	}
 
 	if r.hash {
-		err = RedisCache.HMSet(r.key, r.hashid, data)
+		err = Cache.HMSet(r.key, r.hashid, data)
 	} else {
-		err = RedisCache.Set(r.key, data)
+		err = Cache.Set(r.key, data)
 	}
 	if err != nil {
 		return
@@ -124,32 +127,32 @@ func (r *RedisKey) Set(data []byte) (err error) {
 
 	// unlock this key
 	if r.lock {
-		RedisCache.Unlock(fmt.Sprintf("%s:mutex", r.key))
+		Cache.Unlock(fmt.Sprintf("%s:mutex", r.key))
 	}
 
 	// expire the key if set
 	if r.expire {
-		return RedisCache.Expire(r.key, 600)
+		return Cache.Expire(r.key, 600)
 	}
 
 	return
 }
 
-// deletes a key
-func (r *RedisKey) Delete() (err error) {
+// Delete deletes a key
+func (r *Key) Delete() (err error) {
 
 	if !r.keyset {
 		return errors.New("Key is not set")
 	}
 
-	err = RedisCache.Delete(r.key)
+	err = Cache.Delete(r.key)
 	if err != nil {
 		return
 	}
 
 	// lock this key
 	if r.lock {
-		RedisCache.Lock(fmt.Sprintf("%s:mutex", r.key))
+		Cache.Lock(fmt.Sprintf("%s:mutex", r.key))
 	}
 
 	return

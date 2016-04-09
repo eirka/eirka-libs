@@ -2,16 +2,17 @@ package user
 
 import (
 	"fmt"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
 	e "github.com/eirka/eirka-libs/errors"
 )
 
-// holds the hmac secret, is set from main
+// Secret holds the hmac secret, is set from main
 var Secret string
 
-// checks for session cookie and handles permissions
+// Auth is a gin middleware that checks for session cookie and handles permissions
 func Auth(authenticated bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -36,24 +37,24 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			}
 
 			// get the issuer from claims
-			token_issuer, ok := token.Claims[jwt_claim_issuer].(string)
+			tokenIssuer, ok := token.Claims[jwtClaimIssuer].(string)
 			if !ok {
 				return nil, fmt.Errorf("Couldnt find issuer")
 			}
 
 			// check the issuer
-			if token_issuer != jwt_issuer {
+			if tokenIssuer != jwtIssuer {
 				return nil, fmt.Errorf("Incorrect issuer")
 			}
 
 			// get uid from token
-			token_uid, ok := token.Claims[jwt_claim_user_id].(float64)
+			tokenUID, ok := token.Claims[jwtClaimUserID].(float64)
 			if !ok {
 				return nil, fmt.Errorf("Couldnt find user id")
 			}
 
 			// set the user id
-			user.SetId(uint(token_uid))
+			user.SetID(uint(tokenUID))
 			// set authenticated
 			user.SetAuthenticated()
 

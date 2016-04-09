@@ -3,12 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	// mysql support
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 var db *sql.DB
 
+// Database holds the connection options
 type Database struct {
 	// Database connection settings
 	User           string
@@ -48,7 +50,7 @@ func (d *Database) NewDb() {
 
 }
 
-// get a database mock for testing
+// NewTestDb gets a database mock for testing
 func NewTestDb() (mock sqlmock.Sqlmock, err error) {
 	db, mock, err = sqlmock.New()
 	return

@@ -51,7 +51,7 @@ type Mutex struct {
 
 var _ = Locker(&Mutex{})
 
-// NewMuter initializes a new regex on a redis pool
+// NewMutex initializes a new regex on a redis pool
 func NewMutex(genericNodes []Pool) *Mutex {
 	if len(genericNodes) == 0 {
 		panic("no pools given")

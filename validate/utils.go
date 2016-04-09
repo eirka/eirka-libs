@@ -15,7 +15,7 @@ type Validate struct {
 	Min   int
 }
 
-// Parse parameters from requests to see if they are uint or too huge
+// ValidateParam will parse parameters from requests to see if they are uint or too huge
 func ValidateParam(param string) (id uint, err error) {
 
 	// make sure its a uint
@@ -45,6 +45,7 @@ func (v *Validate) MinLength() bool {
 	return len(v.Input) < v.Min || len(v.Input) == 0
 }
 
+// MinPartsLength will check if the entire string is less than the defined minimum
 func (v *Validate) MinPartsLength() bool {
 
 	// check if the entire string is less than min
@@ -71,7 +72,7 @@ func (v *Validate) IsEmpty() bool {
 	return len(strings.TrimSpace(v.Input)) == 0
 }
 
-// clamp a value to a max and min
+// Clamp a value to a max and min
 func Clamp(value, max, min uint) uint {
 
 	if value > max {

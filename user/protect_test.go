@@ -1,10 +1,11 @@
 package user
 
 import (
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-	"testing"
 
 	"github.com/eirka/eirka-libs/db"
 	"github.com/eirka/eirka-libs/validate"
@@ -37,7 +38,7 @@ func TestProtect(t *testing.T) {
 	assert.Equal(t, first.Code, 401, "HTTP request code should match")
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	user.hash, err = HashPassword("testpassword")

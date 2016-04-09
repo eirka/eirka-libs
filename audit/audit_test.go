@@ -2,9 +2,10 @@ package audit
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-	"testing"
 
 	"github.com/eirka/eirka-libs/db"
 )
@@ -24,7 +25,7 @@ func TestAudit(t *testing.T) {
 		User:   1,
 		Ib:     1,
 		Type:   UserLog,
-		Ip:     "10.0.0.1",
+		IP:     "10.0.0.1",
 		Action: AuditEmailUpdate,
 		Info:   "meta info",
 	}
@@ -45,7 +46,7 @@ func TestAuditInvalid(t *testing.T) {
 		User:   0,
 		Ib:     1,
 		Type:   UserLog,
-		Ip:     "10.0.0.1",
+		IP:     "10.0.0.1",
 		Action: AuditEmailUpdate,
 		Info:   "meta info",
 	}

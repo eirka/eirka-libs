@@ -1,10 +1,11 @@
 package cors
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -43,15 +44,14 @@ func CORS() gin.HandlerFunc {
 
 			return
 
-		} else {
-
-			c.Next()
-
 		}
+
+		c.Next()
 
 	}
 }
 
+// SetDomains will add the valid domains to the map
 func SetDomains(domains, methods []string) {
 	// add valid sites to map
 	for _, site := range domains {

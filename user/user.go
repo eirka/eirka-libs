@@ -1,12 +1,13 @@
 package user
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"regexp"
 	"strings"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
@@ -15,15 +16,15 @@ import (
 
 const (
 	// jwt claim keys
-	jwt_claim_issuer    = "iss"
-	jwt_claim_issued    = "iat"
-	jwt_claim_notbefore = "nbf"
-	jwt_claim_expire    = "exp"
-	jwt_claim_user_id   = "user_id"
+	jwtClaimIssuer    = "iss"
+	jwtClaimIssued    = "iat"
+	jwtClaimNotBefore = "nbf"
+	jwtClaimExpire    = "exp"
+	jwtClaimUserID    = "user_id"
 	// jwt issuer
-	jwt_issuer = "pram"
+	jwtIssuer = "pram"
 	// jwt expire days
-	jwt_expire_days = 90
+	jwtExpireDays = 90
 
 	// the username validation regex
 	username = `^([a-zA-Z0-9]+[\s_-]?)+$`
@@ -50,10 +51,11 @@ var reservedNameList = map[string]bool{
 	"user":           true,
 }
 
+// Authenticator defines the methods for authentication
 type Authenticator interface {
 	IsValid() bool
 	IsAuthorized(ib uint) bool
-	SetId(uid uint)
+	SetID(uid uint)
 	SetAuthenticated()
 	Password() (err error)
 	ComparePassword(password string) bool
@@ -61,9 +63,9 @@ type Authenticator interface {
 	CreateToken() (newtoken string, err error)
 }
 
-// user struct
+// User data struct
 type User struct {
-	Id              uint
+	ID              uint
 	Name            string
 	IsAuthenticated bool
 	hash            []byte
@@ -72,24 +74,24 @@ type User struct {
 
 var _ = Authenticator(&User{})
 
-// create a user struct
+// DefaultUser creates an anonymous user struct
 func DefaultUser() User {
 	return User{
-		Id:              1,
+		ID:              1,
 		IsAuthenticated: false,
 	}
 }
 
-// sets the user id
-func (u *User) SetId(uid uint) {
-	u.Id = uid
+// SetID sets the user id
+func (u *User) SetID(uid uint) {
+	u.ID = uid
 	return
 }
 
-// sets authenticated
+// SetAuthenticated sets a user as authenticated
 func (u *User) SetAuthenticated() {
 	// do not set auth for the wrong users
-	if u.Id == 0 || u.Id == 1 {
+	if u.ID == 0 || u.ID == 1 {
 		return
 	}
 
@@ -97,28 +99,28 @@ func (u *User) SetAuthenticated() {
 	return
 }
 
-// check user struct validity
+// IsValid will check user struct validity
 func (u *User) IsValid() bool {
 
 	// this isnt a real user id
-	if u.Id == 0 {
+	if u.ID == 0 {
 		return false
 	}
 
 	// the anon account can never be authenticated
-	if u.Id == 1 && u.IsAuthenticated {
+	if u.ID == 1 && u.IsAuthenticated {
 		return false
 	}
 
 	// a user can never be unauthenticated
-	if u.Id != 1 && !u.IsAuthenticated {
+	if u.ID != 1 && !u.IsAuthenticated {
 		return false
 	}
 
 	return true
 }
 
-// checks if the name is valid
+// IsValidName checks if the name is valid
 func IsValidName(name string) bool {
 
 	if reservedNameList[strings.ToLower(strings.TrimSpace(name))] {
@@ -128,7 +130,7 @@ func IsValidName(name string) bool {
 	return regexUsername.MatchString(name)
 }
 
-// will get the password and name from the database for an instantiated user
+// Password will get the password and name from the database for an instantiated user
 func (u *User) Password() (err error) {
 
 	// check user struct validity
@@ -143,7 +145,7 @@ func (u *User) Password() (err error) {
 	}
 
 	// get hashed password from database
-	err = dbase.QueryRow("select user_name, user_password from users where user_id = ?", u.Id).Scan(&u.Name, &u.hash)
+	err = dbase.QueryRow("select user_name, user_password from users where user_id = ?", u.ID).Scan(&u.Name, &u.hash)
 	if err != nil {
 		return
 	}
@@ -151,7 +153,7 @@ func (u *User) Password() (err error) {
 	return
 }
 
-// will get the password and user id from the database for a user name
+// FromName will get the password and user id from the database for a user name
 func (u *User) FromName(name string) (err error) {
 
 	// name cant be empty
@@ -166,7 +168,7 @@ func (u *User) FromName(name string) (err error) {
 	}
 
 	// get hashed password from database
-	err = dbase.QueryRow("select user_id, user_password from users where user_name = ?", name).Scan(&u.Id, &u.hash)
+	err = dbase.QueryRow("select user_id, user_password from users where user_name = ?", name).Scan(&u.ID, &u.hash)
 	if err != nil {
 		return
 	}
@@ -181,7 +183,7 @@ func (u *User) FromName(name string) (err error) {
 
 }
 
-// check for duplicate name before registering
+// CheckDuplicate will check for duplicate name before registering
 func CheckDuplicate(name string) (check bool) {
 
 	// name cant be empty
@@ -205,7 +207,7 @@ func CheckDuplicate(name string) (check bool) {
 
 }
 
-// Creates a JWT token with our claims
+// CreateToken will make a JWT token with our claims
 func (u *User) CreateToken() (newtoken string, err error) {
 
 	// error if theres no secret set
@@ -221,7 +223,7 @@ func (u *User) CreateToken() (newtoken string, err error) {
 	}
 
 	// a token should never be created
-	if u.Id == 0 || u.Id == 1 {
+	if u.ID == 0 || u.ID == 1 {
 		err = e.ErrUserNotValid
 		return
 	}
@@ -244,11 +246,11 @@ func (u *User) CreateToken() (newtoken string, err error) {
 	now := time.Now()
 
 	// Set our claims
-	token.Claims[jwt_claim_issuer] = jwt_issuer
-	token.Claims[jwt_claim_issued] = now.Unix()
-	token.Claims[jwt_claim_notbefore] = now.Unix()
-	token.Claims[jwt_claim_expire] = now.Add(time.Hour * 24 * jwt_expire_days).Unix()
-	token.Claims[jwt_claim_user_id] = u.Id
+	token.Claims[jwtClaimIssuer] = jwtIssuer
+	token.Claims[jwtClaimIssued] = now.Unix()
+	token.Claims[jwtClaimNotBefore] = now.Unix()
+	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
+	token.Claims[jwtClaimUserID] = u.ID
 
 	// Sign and get the complete encoded token as a string
 	newtoken, err = token.SignedString([]byte(Secret))
@@ -260,7 +262,7 @@ func (u *User) CreateToken() (newtoken string, err error) {
 
 }
 
-// get the user info from id
+// IsAuthorized will get the perms and role info from the userid
 func (u *User) IsAuthorized(ib uint) bool {
 
 	var err error
@@ -287,7 +289,7 @@ func (u *User) IsAuthorized(ib uint) bool {
 	err = dbase.QueryRow(`SELECT COALESCE((SELECT MAX(role_id) FROM user_ib_role_map WHERE user_ib_role_map.user_id = users.user_id AND ib_id = ?),user_role_map.role_id) as role
     FROM users
     INNER JOIN user_role_map ON (user_role_map.user_id = users.user_id)
-    WHERE users.user_id = ?`, ib, u.Id).Scan(&role)
+    WHERE users.user_id = ?`, ib, u.ID).Scan(&role)
 	if err != nil {
 		return false
 	}
@@ -301,11 +303,9 @@ func (u *User) IsAuthorized(ib uint) bool {
 		return false
 	}
 
-	return false
-
 }
 
-// compare password to
+// ComparePassword will compare the supplied password to the hash from the database
 func (u *User) ComparePassword(password string) bool {
 
 	// password length cant be 0
@@ -328,7 +328,7 @@ func (u *User) ComparePassword(password string) bool {
 
 }
 
-// hash a given password
+// HashPassword will create a bcrypt hash from the given password
 func HashPassword(password string) (hash []byte, err error) {
 
 	// check that password has correct lengths
@@ -347,7 +347,7 @@ func HashPassword(password string) (hash []byte, err error) {
 
 }
 
-// generate random password for password resets
+// RandomPassword will generate a random password for password resets
 func RandomPassword() (password string, hash []byte, err error) {
 
 	password = generateRandomPassword(20)
@@ -376,7 +376,7 @@ func generateRandomPassword(n int) string {
 
 }
 
-// update the user password hash in database
+// UpdatePassword will update the user password hash in database
 func UpdatePassword(hash []byte, uid uint) (err error) {
 
 	// name cant be empty

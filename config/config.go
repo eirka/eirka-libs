@@ -1,14 +1,14 @@
 package config
 
-// Initialize settings with some sane defaults
+// Settings holds an initialized settings with some sane defaults
 var Settings = &Config{
 	General: General{
 		GuestPosting:     true,
 		AutoRegistration: true,
 	},
 	Prim: Prim{
-		Css: "prim.css",
-		Js:  "prim.js",
+		CSS: "prim.css",
+		JS:  "prim.js",
 	},
 	CloudFlare: CloudFlare{},
 	Akismet:    Akismet{},
@@ -65,10 +65,10 @@ type General struct {
 	AutoRegistration bool
 }
 
-// Assets for Prim
+// Prim holds asset names for Prim
 type Prim struct {
-	Css string
-	Js  string
+	CSS string
+	JS  string
 }
 
 // CloudFlare API settings
@@ -83,16 +83,16 @@ type Akismet struct {
 	Host string
 }
 
-// Stop Forum Spam settings
+// StopForumSpam settings
 type StopForumSpam struct {
 	Confidence float64
 }
 
-// Settings for Amazon
+// Amazon holds API settings for Amazon
 type Amazon struct {
 	Region string
 	Bucket string
-	Id     string
+	ID     string
 	Key    string
 }
 

@@ -2,7 +2,7 @@ package config
 
 import "github.com/eirka/eirka-libs/db"
 
-// Get limits that are in the database
+// GetDatabaseSettings gets limits that are in the database
 func GetDatabaseSettings() {
 
 	// Get Database handle
@@ -142,7 +142,7 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
-	err = ps.QueryRow("amazon_id").Scan(&Settings.Amazon.Id)
+	err = ps.QueryRow("amazon_id").Scan(&Settings.Amazon.ID)
 	if err != nil {
 		panic(err)
 	}
@@ -167,12 +167,12 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
-	err = ps.QueryRow("prim_js").Scan(&Settings.Prim.Js)
+	err = ps.QueryRow("prim_js").Scan(&Settings.Prim.JS)
 	if err != nil {
 		panic(err)
 	}
 
-	err = ps.QueryRow("prim_css").Scan(&Settings.Prim.Css)
+	err = ps.QueryRow("prim_css").Scan(&Settings.Prim.CSS)
 	if err != nil {
 		panic(err)
 	}

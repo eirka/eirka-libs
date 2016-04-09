@@ -3,10 +3,11 @@ package status
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	"github.com/gin-gonic/gin"
 	"runtime"
 	"time"
+
+	"github.com/dustin/go-humanize"
+	"github.com/gin-gonic/gin"
 
 	e "github.com/eirka/eirka-libs/errors"
 )
@@ -15,6 +16,7 @@ var (
 	startTime = time.Now()
 )
 
+// Statistics holds runtime stats
 type Statistics struct {
 	Uptime       string
 	NumGoroutine int
@@ -56,6 +58,7 @@ type Statistics struct {
 	NumGC        uint32
 }
 
+// StatusController is a Gin controller to display current runtime info over http
 func StatusController(c *gin.Context) {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)

@@ -2,9 +2,10 @@ package redis
 
 import (
 	"errors"
+	"time"
+
 	"github.com/garyburd/redigo/redis"
 	"github.com/rafaeljusto/redigomock"
-	"time"
 )
 
 // Pool is a generic connection pool
@@ -15,18 +16,21 @@ type Pool interface {
 
 var _ = Pool(&redis.Pool{})
 
-// RedisStore holds a handle to the Redis pool
-type RedisStore struct {
+// Store holds a handle to the Redis pool
+type Store struct {
 	Pool  Pool
 	Mutex *Mutex
 	Mock  *redigomock.Conn
 }
 
 var (
-	RedisCache   RedisStore
-	ErrCacheMiss = errors.New("cache: key not found.")
+	// Cache holds a store
+	Cache Store
+	// ErrCacheMiss is an error for cache misses
+	ErrCacheMiss = errors.New("cache: key not found")
 )
 
+// Redis holds connection options for redis
 type Redis struct {
 	// Redis address and max pool connections
 	Protocol       string
@@ -38,7 +42,7 @@ type Redis struct {
 // NewRedisCache creates a new pool
 func (r *Redis) NewRedisCache() {
 
-	RedisCache.Pool = &redis.Pool{
+	Cache.Pool = &redis.Pool{
 		MaxIdle:     r.MaxIdle,
 		MaxActive:   r.MaxConnections,
 		IdleTimeout: 240 * time.Second,
@@ -52,8 +56,8 @@ func (r *Redis) NewRedisCache() {
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex = NewMutex([]Pool{
-		RedisCache.Pool,
+	Cache.Mutex = NewMutex([]Pool{
+		Cache.Pool,
 	})
 
 	return
@@ -62,17 +66,17 @@ func (r *Redis) NewRedisCache() {
 // NewRedisMock returns a fake redis pool for testing
 func NewRedisMock() {
 
-	RedisCache.Mock = redigomock.NewConn()
+	Cache.Mock = redigomock.NewConn()
 
-	RedisCache.Pool = &redis.Pool{
+	Cache.Pool = &redis.Pool{
 		Dial: func() (redis.Conn, error) {
-			return RedisCache.Mock, nil
+			return Cache.Mock, nil
 		},
 	}
 
 	// create our distributed lock
-	RedisCache.Mutex = NewMutex([]Pool{
-		RedisCache.Pool,
+	Cache.Mutex = NewMutex([]Pool{
+		Cache.Pool,
 	})
 
 	return

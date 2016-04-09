@@ -2,15 +2,16 @@ package amazon
 
 import (
 	"errors"
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"os"
 
 	"github.com/eirka/eirka-libs/config"
 )
 
-// Upload a file to S3
+// Save will upload a file to S3
 func (a *Amazon) Save(filepath, filename, mime string, expire bool) (err error) {
 
 	file, err := os.Open(filepath)

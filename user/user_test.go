@@ -1,9 +1,10 @@
 package user
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-	"testing"
 
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
@@ -13,7 +14,7 @@ func TestDefaultUser(t *testing.T) {
 
 	user := DefaultUser()
 
-	assert.Equal(t, uint(1), user.Id, "default user id should be 1")
+	assert.Equal(t, uint(1), user.ID, "default user id should be 1")
 
 	assert.False(t, user.IsAuthenticated, "default user should not be authenticated")
 
@@ -23,9 +24,9 @@ func TestSetId(t *testing.T) {
 
 	user := DefaultUser()
 
-	user.SetId(2)
+	user.SetID(2)
 
-	assert.Equal(t, uint(2), user.Id, "user id should be 2")
+	assert.Equal(t, uint(2), user.ID, "user id should be 2")
 
 }
 
@@ -37,7 +38,7 @@ func TestSetAuthenticated(t *testing.T) {
 
 	assert.False(t, user.IsAuthenticated, "User should be not authorized")
 
-	user.SetId(2)
+	user.SetID(2)
 
 	user.SetAuthenticated()
 
@@ -53,7 +54,7 @@ func TestIsValid(t *testing.T) {
 
 	assert.True(t, user.IsValid(), "DefaultUser should be valid")
 
-	user.SetId(2)
+	user.SetID(2)
 
 	assert.False(t, user.IsValid(), "Unauthenticated non-anon should be invalid")
 
@@ -61,11 +62,11 @@ func TestIsValid(t *testing.T) {
 
 	assert.True(t, user.IsValid(), "Authed non-anon user should be valid")
 
-	user.SetId(0)
+	user.SetID(0)
 
 	assert.False(t, user.IsValid(), "User zero should be invalid")
 
-	user.SetId(1)
+	user.SetID(1)
 
 	assert.False(t, user.IsValid(), "An authenticated anon user should be invalid")
 
@@ -125,7 +126,7 @@ func TestPassword(t *testing.T) {
 	}
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	assert.False(t, user.ComparePassword("atestpassword"), "Password should not validate")
@@ -164,7 +165,7 @@ func TestRandomPassword(t *testing.T) {
 		}
 
 		user := DefaultUser()
-		user.SetId(2)
+		user.SetID(2)
 		user.SetAuthenticated()
 		user.hash = hash
 
@@ -195,7 +196,7 @@ func TestCreateToken(t *testing.T) {
 		assert.Empty(t, token, "Token should be empty")
 	}
 
-	user.SetId(2)
+	user.SetID(2)
 
 	// a non authed user should never get a token
 	token, err = user.CreateToken()
@@ -232,7 +233,7 @@ func TestCreateTokenAnonAuth(t *testing.T) {
 	Secret = "secret"
 
 	invalidUser := DefaultUser()
-	invalidUser.SetId(1)
+	invalidUser.SetID(1)
 	invalidUser.SetAuthenticated()
 
 	notoken, err := invalidUser.CreateToken()
@@ -247,7 +248,7 @@ func TestCreateTokenZeroAuth(t *testing.T) {
 	Secret = "secret"
 
 	invalidUser := DefaultUser()
-	invalidUser.SetId(0)
+	invalidUser.SetID(0)
 	invalidUser.SetAuthenticated()
 
 	notoken, err := invalidUser.CreateToken()
@@ -262,7 +263,7 @@ func TestCreateTokenZeroNoAuth(t *testing.T) {
 	Secret = "secret"
 
 	invalidUser := DefaultUser()
-	invalidUser.SetId(0)
+	invalidUser.SetID(0)
 
 	notoken, err := invalidUser.CreateToken()
 	if assert.Error(t, err, "An error was expected") {
@@ -276,7 +277,7 @@ func TestUserPassword(t *testing.T) {
 	Secret = "secret"
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	password, err := HashPassword("testpassword")
@@ -306,7 +307,7 @@ func TestUserBadPassword(t *testing.T) {
 	Secret = "secret"
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	password, err := HashPassword("testpassword")
@@ -351,7 +352,7 @@ func TestFromName(t *testing.T) {
 
 	err = user.FromName("testaccount")
 	if assert.NoError(t, err, "An error was not expected") {
-		assert.Equal(t, user.Id, uint(2), "Id should match")
+		assert.Equal(t, user.ID, uint(2), "Id should match")
 		assert.True(t, user.IsAuthenticated, "User should be authenticated")
 		assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
 	}
@@ -448,7 +449,7 @@ func TestIsAuthorizedInvalid(t *testing.T) {
 
 	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
 
-	user.SetId(2)
+	user.SetID(2)
 
 	assert.False(t, user.IsAuthorized(1), "Should not be authorized")
 
@@ -474,7 +475,7 @@ func TestIsAuthorizedDefault(t *testing.T) {
 func TestIsAuthorizedAuth(t *testing.T) {
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	mock, err := db.NewTestDb()
@@ -493,7 +494,7 @@ func TestIsAuthorizedAuth(t *testing.T) {
 func TestIsAuthorizedMod(t *testing.T) {
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	mock, err := db.NewTestDb()
@@ -512,7 +513,7 @@ func TestIsAuthorizedMod(t *testing.T) {
 func TestIsAuthorizedAdmin(t *testing.T) {
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	mock, err := db.NewTestDb()

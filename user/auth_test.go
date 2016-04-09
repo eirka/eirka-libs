@@ -3,12 +3,13 @@ package user
 import (
 	"bytes"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
@@ -69,7 +70,7 @@ func TestAuthSecret(t *testing.T) {
 	assert.Equal(t, second.Code, 200, "HTTP request code should match")
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	user.hash, err = HashPassword("testpassword")
@@ -113,7 +114,7 @@ func TestAuthHeaderToken(t *testing.T) {
 	assert.Equal(t, first.Code, 401, "HTTP request code should match")
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	user.hash, err = HashPassword("testpassword")
@@ -164,7 +165,7 @@ func TestAuthFormToken(t *testing.T) {
 	})
 
 	user := DefaultUser()
-	user.SetId(2)
+	user.SetID(2)
 	user.SetAuthenticated()
 
 	user.hash, err = HashPassword("testpassword")

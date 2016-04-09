@@ -1,20 +1,21 @@
 package csrf
 
 import (
-	e "github.com/eirka/eirka-libs/errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	e "github.com/eirka/eirka-libs/errors"
+	"github.com/gin-gonic/gin"
 )
 
 const (
-	// the name of CSRF header
+	// HeaderName is the name of CSRF header
 	HeaderName = "X-XSRF-TOKEN"
-	// the name of the form field
+	// FormFieldName is the name of the form field
 	FormFieldName = "csrf_token"
-	// the name of CSRF cookie
+	// CookieName is the name of CSRF cookie
 	CookieName = "csrf_token"
-	// the name of the session cookie for angularjs
+	// SessionName the name of the session cookie for angularjs
 	SessionName = "XSRF-TOKEN"
 )
 
@@ -26,7 +27,7 @@ var skipMethods = map[string]bool{
 	"TRACE":   true,
 }
 
-// generates two cookies: a long term csrf token for a user, and a masked session token to verify against
+// Cookie generates two cookies: a long term csrf token for a user, and a masked session token to verify against
 func Cookie() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -61,12 +62,12 @@ func Cookie() gin.HandlerFunc {
 		}
 
 		// generate a session token
-		session_token := b64encode(maskToken(csrfToken))
+		sessionToken := b64encode(maskToken(csrfToken))
 
 		// set the users csrf token tookie
 		sessionCookie := &http.Cookie{
 			Name:  SessionName,
-			Value: session_token,
+			Value: sessionToken,
 			Path:  "/",
 		}
 
@@ -74,14 +75,14 @@ func Cookie() gin.HandlerFunc {
 		http.SetCookie(c.Writer, sessionCookie)
 
 		// pass token to controllers
-		c.Set("csrf_token", string(session_token))
+		c.Set("csrf_token", string(sessionToken))
 
 		c.Next()
 
 	}
 }
 
-// verify the sent csrf token
+// Verify the sent csrf token
 func Verify() gin.HandlerFunc {
 	return func(c *gin.Context) {
 

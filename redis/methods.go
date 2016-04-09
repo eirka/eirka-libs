@@ -4,7 +4,8 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-type RedisStorer interface {
+// Storer defines custom methods for redis operations
+type Storer interface {
 	Lock(key string) error
 	Unlock(key string) bool
 	Get(key string) (result []byte, err error)
@@ -18,20 +19,20 @@ type RedisStorer interface {
 	Expire(key string, timeout uint) (err error)
 }
 
-var _ = RedisStorer(&RedisStore{})
+var _ = Storer(&Store{})
 
-// lock our shared mutex
-func (c *RedisStore) Lock(key string) error {
+// Lock our shared mutex
+func (c *Store) Lock(key string) error {
 	return c.Mutex.Lock(key)
 }
 
-// unlock our shared mutex
-func (c *RedisStore) Unlock(key string) bool {
+// Unlock our shared mutex
+func (c *Store) Unlock(key string) bool {
 	return c.Mutex.Unlock(key)
 }
 
 // Get will retrieve a key
-func (c *RedisStore) Get(key string) (result []byte, err error) {
+func (c *Store) Get(key string) (result []byte, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -40,7 +41,7 @@ func (c *RedisStore) Get(key string) (result []byte, err error) {
 }
 
 // HGet will retrieve a hash
-func (c *RedisStore) HGet(key string, value string) (result []byte, err error) {
+func (c *Store) HGet(key string, value string) (result []byte, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -49,7 +50,7 @@ func (c *RedisStore) HGet(key string, value string) (result []byte, err error) {
 }
 
 // Set will set a single record
-func (c *RedisStore) Set(key string, result []byte) (err error) {
+func (c *Store) Set(key string, result []byte) (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -58,8 +59,8 @@ func (c *RedisStore) Set(key string, result []byte) (err error) {
 	return
 }
 
-// Set will set a single record
-func (c *RedisStore) SetEx(key string, timeout uint, result []byte) (err error) {
+// SetEx will set a single record with an expiration
+func (c *Store) SetEx(key string, timeout uint, result []byte) (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -69,7 +70,7 @@ func (c *RedisStore) SetEx(key string, timeout uint, result []byte) (err error) 
 }
 
 // HMSet will set a hash
-func (c *RedisStore) HMSet(key string, value string, result []byte) (err error) {
+func (c *Store) HMSet(key string, value string, result []byte) (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -79,7 +80,7 @@ func (c *RedisStore) HMSet(key string, value string, result []byte) (err error) 
 }
 
 // Delete will delete a key
-func (c *RedisStore) Delete(key ...interface{}) (err error) {
+func (c *Store) Delete(key ...interface{}) (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -89,7 +90,7 @@ func (c *RedisStore) Delete(key ...interface{}) (err error) {
 }
 
 // Flush will call flushall and delete all keys
-func (c *RedisStore) Flush() (err error) {
+func (c *Store) Flush() (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -98,16 +99,16 @@ func (c *RedisStore) Flush() (err error) {
 	return
 }
 
-// will increment a redis key
-func (c *RedisStore) Incr(key string) (result int, err error) {
+// Incr will increment a redis key
+func (c *Store) Incr(key string) (result int, err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
 	return redis.Int(conn.Do("INCR", key))
 }
 
-// will set expire on a redis key
-func (c *RedisStore) Expire(key string, timeout uint) (err error) {
+// Expire will set expire on a redis key
+func (c *Store) Expire(key string, timeout uint) (err error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
