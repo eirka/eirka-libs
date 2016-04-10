@@ -17,7 +17,7 @@ type Amazon struct {
 func New() (amazon *Amazon) {
 
 	// new credentials from settings
-	creds := credentials.NewStaticCredentials(config.Settings.Amazon.Id, config.Settings.Amazon.Key, "")
+	creds := credentials.NewStaticCredentials(config.Settings.Amazon.ID, config.Settings.Amazon.Key, "")
 
 	// create our session
 	sess := session.New(&aws.Config{
