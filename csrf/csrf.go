@@ -113,7 +113,7 @@ func Verify() gin.HandlerFunc {
 
 		// error if there was no csrf token or it isnt verified
 		if csrfToken == nil || !verifyToken(csrfToken, b64decode(sentToken)) {
-			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
+			c.JSON(e.ErrorMessage(e.ErrForbidden))
 			c.Error(e.ErrCsrfNotValid).SetMeta("csrf.Verify")
 			c.Abort()
 			return

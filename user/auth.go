@@ -68,6 +68,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 		})
 		// if theres some jwt error other than no token in request or the token is invalid then return unauth
+		// the client side should delete any saved JWT tokens on unauth error
 		if err != nil && err != jwt.ErrNoTokenInRequest || token != nil && !token.Valid {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 			c.Error(err).SetMeta("user.Auth")
@@ -80,13 +81,13 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// if we just check equality then logged in users wont be able
 		// to view anon pages ;P
 		if authenticated && !user.IsAuthenticated {
-			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-			c.Error(e.ErrUnauthorized).SetMeta("user.Auth")
+			c.JSON(e.ErrorMessage(e.ErrForbidden))
+			c.Error(e.ErrForbidden).SetMeta("user.Auth")
 			c.Abort()
 			return
 		}
 
-		// set user data
+		// set user data for controllers
 		c.Set("userdata", user)
 
 		c.Next()
