@@ -1,36 +1,16 @@
 package user
 
 import (
-	"math/rand"
 	"regexp"
 	"strings"
-	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
-
-	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 )
 
 const (
-	// jwt claim keys
-	jwtClaimIssuer    = "iss"
-	jwtClaimIssued    = "iat"
-	jwtClaimNotBefore = "nbf"
-	jwtClaimExpire    = "exp"
-	jwtClaimUserID    = "user_id"
-	// jwt issuer
-	jwtIssuer = "pram"
-	// jwt expire days
-	jwtExpireDays = 90
-
 	// the username validation regex
 	username = `^([a-zA-Z0-9]+[\s_-]?)+$`
-
-	// characters for random password generator
-	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 )
 
 var regexUsername = regexp.MustCompile(username)
@@ -207,61 +187,6 @@ func CheckDuplicate(name string) (check bool) {
 
 }
 
-// CreateToken will make a JWT token with our claims
-func (u *User) CreateToken() (newtoken string, err error) {
-
-	// error if theres no secret set
-	if Secret == "" {
-		err = e.ErrNoSecret
-		return
-	}
-
-	// check user struct validity
-	if !u.IsValid() {
-		err = e.ErrUserNotValid
-		return
-	}
-
-	// a token should never be created
-	if u.ID == 0 || u.ID == 1 {
-		err = e.ErrUserNotValid
-		return
-	}
-
-	// a token should never be created
-	if !u.IsAuthenticated {
-		err = e.ErrUserNotValid
-		return
-	}
-
-	// check if password was valid
-	if !u.isPasswordValid {
-		err = e.ErrInvalidPassword
-		return
-	}
-
-	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
-	// the current time
-	now := time.Now()
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = u.ID
-
-	// Sign and get the complete encoded token as a string
-	newtoken, err = token.SignedString([]byte(Secret))
-	if err != nil {
-		return
-	}
-
-	return
-
-}
-
 // IsAuthorized will get the perms and role info from the userid
 func (u *User) IsAuthorized(ib uint) bool {
 
@@ -302,104 +227,5 @@ func (u *User) IsAuthorized(ib uint) bool {
 	default:
 		return false
 	}
-
-}
-
-// ComparePassword will compare the supplied password to the hash from the database
-func (u *User) ComparePassword(password string) bool {
-
-	// password length cant be 0
-	if len(password) == 0 {
-		return false
-	}
-
-	// if the hash wasnt populated
-	if len(u.hash) == 0 {
-		return false
-	}
-
-	// compare the stored hash with the provided password
-	err := bcrypt.CompareHashAndPassword(u.hash, []byte(password))
-
-	// we only want jwt tokens to be created after a valid password has been given
-	u.isPasswordValid = err == nil
-
-	return u.isPasswordValid
-
-}
-
-// HashPassword will create a bcrypt hash from the given password
-func HashPassword(password string) (hash []byte, err error) {
-
-	// check that password has correct lengths
-	if len(password) == 0 {
-		err = e.ErrPasswordEmpty
-		return
-	} else if len(password) < config.Settings.Limits.PasswordMinLength {
-		err = e.ErrPasswordShort
-		return
-	} else if len(password) > config.Settings.Limits.PasswordMaxLength {
-		err = e.ErrPasswordLong
-		return
-	}
-
-	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-}
-
-// RandomPassword will generate a random password for password resets
-func RandomPassword() (password string, hash []byte, err error) {
-
-	password = generateRandomPassword(20)
-
-	hash, err = HashPassword(password)
-
-	return
-
-}
-
-// will generate a password with random characters
-func generateRandomPassword(n int) string {
-
-	// random source
-	src := rand.NewSource(time.Now().UnixNano())
-
-	// byte slice to hold password
-	b := make([]byte, n)
-
-	// range over byte slice and fill with random letters
-	for i := range b {
-		b[i] = letterBytes[src.Int63()%int64(len(letterBytes))]
-	}
-
-	return string(b)
-
-}
-
-// UpdatePassword will update the user password hash in database
-func UpdatePassword(hash []byte, uid uint) (err error) {
-
-	// name cant be empty
-	if uid == 0 || uid == 1 {
-		return e.ErrUserNotValid
-	}
-
-	// hash cant be empty
-	if hash == nil || len(hash) == 0 {
-		return e.ErrInvalidPassword
-	}
-
-	// Get Database handle
-	dbase, err := db.GetDb()
-	if err != nil {
-		return
-	}
-
-	_, err = dbase.Exec("UPDATE users SET user_password = ? WHERE user_id = ?", hash, uid)
-	if err != nil {
-		return
-	}
-
-	return
 
 }
