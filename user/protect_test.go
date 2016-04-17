@@ -35,7 +35,7 @@ func TestProtect(t *testing.T) {
 
 	first := performRequest(router, "GET", "/important/1")
 
-	assert.Equal(t, first.Code, 401, "HTTP request code should match")
+	assert.Equal(t, first.Code, 403, "HTTP request code should match")
 
 	user := DefaultUser()
 	user.SetID(2)
