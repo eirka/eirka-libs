@@ -80,10 +80,22 @@ func (r *Key) SetKey(ids ...string) *Key {
 		return r
 	}
 
+	// the total mount of fields
+	total := r.fieldcount
+
+	if r.hash {
+		total++
+	}
+
+	// make sure total fields given is not more than allowed
+	if len(ids) != total {
+		return r
+	}
+
 	// create our key
 	r.key = strings.Join([]string{r.base, strings.Join(ids[:r.fieldcount], ":")}, ":")
 
-	// get our hash id
+	// get our hash key
 	if r.hash {
 		r.hashid = strings.Join(ids[r.fieldcount:], "")
 	}
@@ -152,7 +164,7 @@ func (r *Key) Delete() (err error) {
 
 	// lock this key
 	if r.lock {
-		Cache.Lock(fmt.Sprintf("%s:mutex", r.key))
+		err = Cache.Lock(fmt.Sprintf("%s:mutex", r.key))
 	}
 
 	return
