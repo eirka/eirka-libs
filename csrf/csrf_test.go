@@ -72,7 +72,7 @@ func TestCsrfVerify(t *testing.T) {
 
 	second := performRequest(router, "POST", "/reply")
 
-	assert.Equal(t, second.Code, 401, "HTTP request code should match")
+	assert.Equal(t, second.Code, 403, "HTTP request code should match")
 
 }
 
@@ -134,7 +134,7 @@ func TestCsrfVerifyHeader(t *testing.T) {
 
 	badrequest := performCsrfHeaderRequest(router, "POST", "/reply", "badtoken")
 
-	assert.Equal(t, badrequest.Code, 401, "HTTP request code should match")
+	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
 
 	goodrequest := performCsrfHeaderRequest(router, "POST", "/reply", sessionToken)
 
@@ -158,7 +158,7 @@ func TestCsrfVerifyForm(t *testing.T) {
 
 	badrequest := performCsrfFormRequest(router, "POST", "/reply", "badtoken")
 
-	assert.Equal(t, badrequest.Code, 401, "HTTP request code should match")
+	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
 
 	goodrequest := performCsrfFormRequest(router, "POST", "/reply", sessionToken)
 

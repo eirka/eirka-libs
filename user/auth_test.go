@@ -111,7 +111,7 @@ func TestAuthHeaderToken(t *testing.T) {
 
 	first := performRequest(router, "GET", "/")
 
-	assert.Equal(t, first.Code, 401, "HTTP request code should match")
+	assert.Equal(t, first.Code, 403, "HTTP request code should match")
 
 	user := DefaultUser()
 	user.SetID(2)
