@@ -32,20 +32,36 @@ func (c *Store) Unlock(key string) bool {
 }
 
 // Get will retrieve a key
-func (c *Store) Get(key string) (result []byte, err error) {
+func (c *Store) Get(key string) ([]byte, error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
-	return redis.Bytes(conn.Do("GET", key))
+	result, err := redis.Bytes(conn.Do("GET", key))
+	if err == redis.ErrNil {
+		return nil, ErrCacheMiss
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 
 }
 
 // HGet will retrieve a hash
-func (c *Store) HGet(key string, value string) (result []byte, err error) {
+func (c *Store) HGet(key string, value string) ([]byte, error) {
 	conn := c.Pool.Get()
 	defer conn.Close()
 
-	return redis.Bytes(conn.Do("HGET", key, value))
+	result, err := redis.Bytes(conn.Do("HGET", key, value))
+	if err == redis.ErrNil {
+		return nil, ErrCacheMiss
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 
 }
 

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/rafaeljusto/redigomock"
@@ -19,6 +20,26 @@ func TestMethodGet(t *testing.T) {
 
 	assert.NoError(t, err, "An error was not expected")
 
+	Cache.Mock.Command("GET", "index:1").Expect(nil)
+
+	empty, err := Cache.Get("index:1")
+
+	assert.Empty(t, empty, "Should not return data")
+
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, ErrCacheMiss, "Error should be the same")
+	}
+
+	Cache.Mock.Command("GET", "index:1").ExpectError(errors.New("oh shit"))
+
+	bad, err := Cache.Get("index:1")
+
+	assert.Empty(t, bad, "Should not return data")
+
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, errors.New("oh shit"), "Error should be the same")
+	}
+
 }
 
 func TestMethodHGet(t *testing.T) {
@@ -32,6 +53,26 @@ func TestMethodHGet(t *testing.T) {
 	assert.NotEmpty(t, res, "Should return data")
 
 	assert.NoError(t, err, "An error was not expected")
+
+	Cache.Mock.Command("HGET", "index:1", "1").Expect(nil)
+
+	empty, err := Cache.HGet("index:1", "1")
+
+	assert.Empty(t, empty, "Should not return data")
+
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, ErrCacheMiss, "Error should be the same")
+	}
+
+	Cache.Mock.Command("HGET", "index:1", "1").ExpectError(errors.New("oh shit"))
+
+	bad, err := Cache.HGet("index:1", "1")
+
+	assert.Empty(t, bad, "Should not return data")
+
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, errors.New("oh shit"), "Error should be the same")
+	}
 
 }
 
