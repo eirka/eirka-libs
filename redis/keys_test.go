@@ -300,19 +300,6 @@ func TestKeysDeleteError(t *testing.T) {
 	assert.Error(t, err, "An error was expected")
 }
 
-func TestKeysDeleteKeyNotSet(t *testing.T) {
-
-	key := NewKey("index")
-
-	key = key.SetKey()
-
-	err := key.Delete()
-
-	if assert.Error(t, err, "An error was expected") {
-		assert.Equal(t, err, ErrKeyNotSet, "Error should be the same")
-	}
-}
-
 func TestKeysDeleteLock(t *testing.T) {
 
 	server, err := tempredis.Start(tempredis.Config{})
