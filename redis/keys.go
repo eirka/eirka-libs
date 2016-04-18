@@ -154,6 +154,10 @@ func (r *Key) Set(data []byte) (err error) {
 // Delete deletes a key
 func (r *Key) Delete() (err error) {
 
+	if !r.keyset {
+		return ErrKeyNotSet
+	}
+
 	err = Cache.Delete(r.key)
 	if err != nil {
 		return
