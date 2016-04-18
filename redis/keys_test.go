@@ -191,7 +191,9 @@ func TestKeysGetKeyNotSet(t *testing.T) {
 
 	assert.Empty(t, res, "Should not return data")
 
-	assert.Error(t, err, "An error was expected")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, ErrKeyNotSet, "Error should be the same")
+	}
 }
 
 func TestKeysSet(t *testing.T) {
@@ -263,7 +265,9 @@ func TestKeysSetKeyNotSet(t *testing.T) {
 
 	err := key.Set([]byte("hello"))
 
-	assert.Error(t, err, "An error was expected")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, ErrKeyNotSet, "Error should be the same")
+	}
 }
 
 func TestKeysDelete(t *testing.T) {
@@ -304,7 +308,9 @@ func TestKeysDeleteKeyNotSet(t *testing.T) {
 
 	err := key.Delete()
 
-	assert.Error(t, err, "An error was expected")
+	if assert.Error(t, err, "An error was expected") {
+		assert.Equal(t, err, ErrKeyNotSet, "Error should be the same")
+	}
 }
 
 func TestKeysDeleteLock(t *testing.T) {

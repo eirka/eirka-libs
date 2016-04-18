@@ -30,6 +30,8 @@ type Key struct {
 var _ = Keyer(&Key{})
 
 var (
+	// ErrKeyNotSet returns if the key was not set properly
+	ErrKeyNotSet = errors.New("key not set")
 	// RedisKeyIndex holds a searchable index of keys
 	RedisKeyIndex = make(map[string]Key)
 	// RedisKeys is a slice of all the explicit keys
@@ -109,8 +111,7 @@ func (r *Key) SetKey(ids ...string) *Key {
 func (r *Key) Get() (result []byte, err error) {
 
 	if !r.keyset {
-		err = errors.New("Key is not set")
-		return
+		return nil, ErrKeyNotSet
 	}
 
 	if r.hash {
@@ -125,7 +126,7 @@ func (r *Key) Get() (result []byte, err error) {
 func (r *Key) Set(data []byte) (err error) {
 
 	if !r.keyset {
-		return errors.New("Key is not set")
+		return ErrKeyNotSet
 	}
 
 	if r.hash {
@@ -154,7 +155,7 @@ func (r *Key) Set(data []byte) (err error) {
 func (r *Key) Delete() (err error) {
 
 	if !r.keyset {
-		return errors.New("Key is not set")
+		return ErrKeyNotSet
 	}
 
 	err = Cache.Delete(r.key)
