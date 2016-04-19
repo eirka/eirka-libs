@@ -23,26 +23,11 @@ const (
 	jwtExpireDays = 90
 )
 
-// jwtKeys holds the requested jwt secrets for caching
-var jwtKeys = map[uint][]byte{}
-
-// CreateToken will make a JWT token with our claims
+// CreateToken will make a JWT token associated with a user
 func (u *User) CreateToken() (newtoken string, err error) {
-
-	// error if theres no secret set
-	if Secret == "" {
-		err = e.ErrNoSecret
-		return
-	}
 
 	// check user struct validity
 	if !u.IsValid() {
-		err = e.ErrUserNotValid
-		return
-	}
-
-	// a token should never be created
-	if u.ID == 0 || u.ID == 1 {
 		err = e.ErrUserNotValid
 		return
 	}
@@ -56,6 +41,25 @@ func (u *User) CreateToken() (newtoken string, err error) {
 	// check if password was valid
 	if !u.isPasswordValid {
 		err = e.ErrInvalidPassword
+		return
+	}
+
+	return MakeToken(Secret, u.ID)
+
+}
+
+// MakeToken will create a JWT token
+func MakeToken(secret string, uid uint) (newtoken string, err error) {
+
+	// error if theres no secret set
+	if secret == "" {
+		err = e.ErrNoSecret
+		return
+	}
+
+	// a token should never be created for these users
+	if uid == 0 || uid == 1 {
+		err = e.ErrUserNotValid
 		return
 	}
 
@@ -73,14 +77,8 @@ func (u *User) CreateToken() (newtoken string, err error) {
 	token.Claims[jwtClaimIssued] = now.Unix()
 	token.Claims[jwtClaimNotBefore] = now.Unix()
 	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = u.ID
+	token.Claims[jwtClaimUserID] = uid
 
-	// Sign and get the complete encoded token as a string
-	newtoken, err = token.SignedString([]byte(Secret))
-	if err != nil {
-		return
-	}
-
-	return
+	return token.SignedString([]byte(secret))
 
 }

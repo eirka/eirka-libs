@@ -12,7 +12,8 @@ import (
 // Secret holds the hmac secret, is set from main
 var Secret string
 
-// Auth is a gin middleware that checks for session cookie and handles permissions
+// Auth is a gin middleware that checks for session cookie and
+// handles permissions
 func Auth(authenticated bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -29,45 +30,10 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 		// parse jwt token if its there
 		token, err := jwt.ParseFromRequest(c.Request, func(token *jwt.Token) (interface{}, error) {
-
-			// check alg to make sure its hmac
-			_, ok := token.Method.(*jwt.SigningMethodHMAC)
-			if !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-
-			// get the issuer from claims
-			tokenIssuer, ok := token.Claims[jwtClaimIssuer].(string)
-			if !ok {
-				return nil, fmt.Errorf("Couldnt find issuer")
-			}
-
-			// check the issuer
-			if tokenIssuer != jwtIssuer {
-				return nil, fmt.Errorf("Incorrect issuer")
-			}
-
-			// get uid from token
-			tokenUID, ok := token.Claims[jwtClaimUserID].(float64)
-			if !ok {
-				return nil, fmt.Errorf("Couldnt find user id")
-			}
-
-			// set the user id
-			user.SetID(uint(tokenUID))
-			// set authenticated
-			user.SetAuthenticated()
-
-			// check that the generated user is valid
-			if !user.IsValid() {
-				return nil, fmt.Errorf("Generated invalid user")
-			}
-
-			// compare with secret from settings
-			return []byte(Secret), nil
-
+			return validateToken(token, &user)
 		})
-		// if theres some jwt error other than no token in request or the token is invalid then return unauth
+		// if theres some jwt error other than no token in request or the token is
+		// invalid then return unauth
 		// the client side should delete any saved JWT tokens on unauth error
 		if err != nil && err != jwt.ErrNoTokenInRequest || token != nil && !token.Valid {
 			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
@@ -93,5 +59,45 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		c.Next()
 
 	}
+
+}
+
+func validateToken(token *jwt.Token, user *User) ([]byte, error) {
+
+	// check alg to make sure its hmac
+	_, ok := token.Method.(*jwt.SigningMethodHMAC)
+	if !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+
+	// get the issuer from claims
+	tokenIssuer, ok := token.Claims[jwtClaimIssuer].(string)
+	if !ok {
+		return nil, fmt.Errorf("Couldnt find issuer")
+	}
+
+	// check the issuer
+	if tokenIssuer != jwtIssuer {
+		return nil, fmt.Errorf("Incorrect issuer")
+	}
+
+	// get uid from token
+	tokenUID, ok := token.Claims[jwtClaimUserID].(float64)
+	if !ok {
+		return nil, fmt.Errorf("Couldnt find user id")
+	}
+
+	// set the user id
+	user.SetID(uint(tokenUID))
+	// set authenticated
+	user.SetAuthenticated()
+
+	// check that the user was actually authed
+	if !user.IsAuthenticated {
+		return nil, fmt.Errorf("User is not authenticated")
+	}
+
+	// compare with secret from settings
+	return []byte(Secret), nil
 
 }
