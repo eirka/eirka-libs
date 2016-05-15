@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -28,18 +29,24 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		// set default anonymous user
 		user := DefaultUser()
 
+		// try and get the jwt cookie from the request
+		cookie, err := c.Request.Cookie(CookieName)
 		// parse jwt token if its there
-		token, err := jwt.ParseFromRequest(c.Request, func(token *jwt.Token) (interface{}, error) {
-			return validateToken(token, &user)
-		})
-		// if theres some jwt error other than no token in request or the token is
-		// invalid then return unauth
-		// the client side should delete any saved JWT tokens on unauth error
-		if err != nil && err != jwt.ErrNoTokenInRequest || token != nil && !token.Valid {
-			c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-			c.Error(err).SetMeta("user.Auth")
-			c.Abort()
-			return
+		if err != http.ErrNoCookie {
+			token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
+				return validateToken(token, &user)
+			})
+			// if theres some jwt error other than no token in request or the token is
+			// invalid then return unauth
+			// the client side should delete any saved JWT tokens on unauth error
+			if err != nil || !token.Valid {
+				// delete the cookie
+				http.SetCookie(c.Writer, DeleteCookie())
+				c.JSON(e.ErrorMessage(e.ErrUnauthorized))
+				c.Error(err).SetMeta("user.Auth")
+				c.Abort()
+				return
+			}
 		}
 
 		// check if user needed to be authenticated
@@ -62,6 +69,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 }
 
+// validateToken checks all the claims in the provided token
 func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 
 	// check alg to make sure its hmac
