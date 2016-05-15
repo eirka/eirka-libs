@@ -1,9 +1,7 @@
 package user
 
 import (
-	"bytes"
 	"fmt"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,23 +19,9 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 	return w
 }
 
-func performJwtHeaderRequest(r http.Handler, method, path, token string) *httptest.ResponseRecorder {
+func performJWTCookieRequest(r http.Handler, method, path, token string) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, path, nil)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	return w
-}
-
-func performJwtFormRequest(r http.Handler, method, path, token string) *httptest.ResponseRecorder {
-	var b bytes.Buffer
-
-	mw := multipart.NewWriter(&b)
-	mw.WriteField("access_token", token)
-	mw.Close()
-
-	req, _ := http.NewRequest(method, path, &b)
-	req.Header.Set("Content-Type", mw.FormDataContentType())
+	req.AddCookie(CreateCookie(token))
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	return w
@@ -87,13 +71,13 @@ func TestAuthSecret(t *testing.T) {
 		assert.NotEmpty(t, token, "token should be returned")
 	}
 
-	third := performJwtHeaderRequest(router, "GET", "/", token)
+	third := performJWTCookieRequest(router, "GET", "/", token)
 
 	assert.Equal(t, third.Code, 200, "HTTP request code should match")
 
 }
 
-func TestAuthHeaderToken(t *testing.T) {
+func TestAuthToken(t *testing.T) {
 
 	var err error
 
@@ -133,69 +117,26 @@ func TestAuthHeaderToken(t *testing.T) {
 
 	Secret = "changed"
 
-	second := performJwtHeaderRequest(router, "GET", "/", badtoken)
+	second := performJWTCookieRequest(router, "GET", "/", badtoken)
 
 	assert.Equal(t, second.Code, 401, "HTTP request code should match")
 
-	goodtoken, err := user.CreateToken()
-	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotEmpty(t, goodtoken, "token should be returned")
-	}
+	third := performJWTCookieRequest(router, "GET", "/", "auhwfuiwaehf")
 
-	third := performJwtHeaderRequest(router, "GET", "/", goodtoken)
+	assert.Equal(t, third.Code, 401, "HTTP request code should match")
 
-	assert.Equal(t, third.Code, 200, "HTTP request code should match")
+	fourth := performJWTCookieRequest(router, "GET", "/", "")
 
-}
-
-func TestAuthFormToken(t *testing.T) {
-
-	var err error
-
-	Secret = "secret"
-
-	gin.SetMode(gin.ReleaseMode)
-
-	router := gin.New()
-
-	// route is protected
-	router.Use(Auth(true))
-
-	router.GET("/", func(c *gin.Context) {
-		c.String(200, "OK")
-		return
-	})
-
-	user := DefaultUser()
-	user.SetID(2)
-	user.SetAuthenticated()
-
-	user.hash, err = HashPassword("testpassword")
-	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotNil(t, user.hash, "password should be returned")
-	}
-
-	assert.True(t, user.ComparePassword("testpassword"), "Password should validate")
-
-	badtoken, err := user.CreateToken()
-	if assert.NoError(t, err, "An error was not expected") {
-		assert.NotEmpty(t, badtoken, "token should be returned")
-	}
-
-	Secret = "changed"
-
-	first := performJwtFormRequest(router, "GET", "/", badtoken)
-
-	assert.Equal(t, first.Code, 401, "HTTP request code should match")
+	assert.Equal(t, fourth.Code, 401, "HTTP request code should match")
 
 	goodtoken, err := user.CreateToken()
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, goodtoken, "token should be returned")
 	}
 
-	second := performJwtFormRequest(router, "GET", "/", goodtoken)
+	fifth := performJWTCookieRequest(router, "GET", "/", goodtoken)
 
-	assert.Equal(t, second.Code, 200, "HTTP request code should match")
+	assert.Equal(t, fifth.Code, 200, "HTTP request code should match")
 
 }
 
@@ -403,7 +344,7 @@ func TestAuthTokenBadNBF(t *testing.T) {
 	tkn, err := token.SignedString([]byte("secret"))
 	assert.NoError(t, err, "An error was not expected")
 
-	req := performJwtHeaderRequest(router, "GET", "/", tkn)
+	req := performJWTCookieRequest(router, "GET", "/", tkn)
 
 	assert.Equal(t, req.Code, 401, "HTTP request code should match")
 
@@ -444,7 +385,7 @@ func TestAuthTokenExpired(t *testing.T) {
 	tkn, err := token.SignedString([]byte("secret"))
 	assert.NoError(t, err, "An error was not expected")
 
-	req := performJwtHeaderRequest(router, "GET", "/", tkn)
+	req := performJWTCookieRequest(router, "GET", "/", tkn)
 
 	assert.Equal(t, req.Code, 401, "HTTP request code should match")
 

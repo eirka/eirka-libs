@@ -57,7 +57,7 @@ func TestProtect(t *testing.T) {
 
 	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(firstrows)
 
-	second := performJwtHeaderRequest(router, "GET", "/important/1", token)
+	second := performJWTCookieRequest(router, "GET", "/important/1", token)
 
 	assert.Equal(t, second.Code, 403, "HTTP request code should match")
 
@@ -65,7 +65,7 @@ func TestProtect(t *testing.T) {
 
 	mock.ExpectQuery(`SELECT COALESCE`).WillReturnRows(secondrows)
 
-	third := performJwtHeaderRequest(router, "GET", "/important/1", token)
+	third := performJWTCookieRequest(router, "GET", "/important/1", token)
 
 	assert.Equal(t, third.Code, 200, "HTTP request code should match")
 
