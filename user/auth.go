@@ -40,6 +40,8 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			// invalid then return unauth
 			// the client side should delete any saved JWT tokens on unauth error
 			if err != nil || !token.Valid {
+				// delete the cookie
+				http.SetCookie(c.Writer, DeleteCookie())
 				c.JSON(e.ErrorMessage(e.ErrUnauthorized))
 				c.Error(err).SetMeta("user.Auth")
 				c.Abort()
