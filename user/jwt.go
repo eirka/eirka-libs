@@ -21,6 +21,9 @@ const (
 	jwtIssuer = "pram"
 	// jwt expire days
 	jwtExpireDays = 90
+
+	// CookieName is the name of the jwt session cookie
+	CookieName = "session_jwt"
 )
 
 // CreateToken will make a JWT token associated with a user
