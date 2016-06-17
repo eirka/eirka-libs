@@ -11,17 +11,17 @@ import (
 const (
 	// jwt header keys
 	jwtHeaderKeyID = "kid"
-	// jwt claim keys
-	jwtClaimIssuer    = "iss"
-	jwtClaimIssued    = "iat"
-	jwtClaimNotBefore = "nbf"
-	jwtClaimExpire    = "exp"
-	jwtClaimUserID    = "user_id"
 	// jwt issuer
 	jwtIssuer = "pram"
 	// jwt expire days
 	jwtExpireDays = 90
 )
+
+// TokenClaims holds the custom and standard claims for the JWT token
+type TokenClaims struct {
+	User uint `json:"user_id"`
+	jwt.StandardClaims
+}
 
 // CreateToken will make a JWT token associated with a user
 func (u *User) CreateToken() (newtoken string, err error) {
@@ -66,18 +66,21 @@ func MakeToken(secret string, uid uint) (newtoken string, err error) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		uid,
+		jwt.StandardClaims{
+			Issuer:    jwtIssuer,
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = uid
 
 	return token.SignedString([]byte(secret))
 

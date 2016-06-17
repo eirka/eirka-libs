@@ -33,7 +33,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		cookie, err := c.Request.Cookie(CookieName)
 		// parse jwt token if its there
 		if err != http.ErrNoCookie {
-			token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(cookie.Value, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 				return validateToken(token, &user)
 			})
 			// if theres some jwt error other than no token in request or the token is
@@ -78,11 +78,14 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	}
 
-	// get the issuer from claims
-	tokenIssuer, ok := token.Claims[jwtClaimIssuer].(string)
+	// get the claims from the token
+	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
-		return nil, fmt.Errorf("Couldnt find issuer")
+		return nil, fmt.Errorf("Couldnt parse claims")
 	}
+
+	// get the issuer from claims
+	tokenIssuer := claims.Issuer
 
 	// check the issuer
 	if tokenIssuer != jwtIssuer {
@@ -90,10 +93,7 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 	}
 
 	// get uid from token
-	tokenUID, ok := token.Claims[jwtClaimUserID].(float64)
-	if !ok {
-		return nil, fmt.Errorf("Couldnt find user id")
-	}
+	tokenUID := claims.User
 
 	// set the user id
 	user.SetID(uint(tokenUID))

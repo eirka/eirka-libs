@@ -46,14 +46,18 @@ func TestMakeTokenValidateOutput(t *testing.T) {
 		assert.NotEmpty(t, token, "Token should not be empty")
 	}
 
-	out, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	out, err := jwt.ParseWithClaims(token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, out, "Token should not be empty")
 	}
 
-	assert.Equal(t, out.Claims[jwtClaimUserID], float64(2), "Claim should match")
+	// get the claims from the token
+	claims, ok := out.Claims.(*TokenClaims)
+	assert.False(t, ok, "Should be true")
+
+	assert.Equal(t, claims.User, 2, "Claim should match")
 
 }
 

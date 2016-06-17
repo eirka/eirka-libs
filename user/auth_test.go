@@ -149,18 +149,21 @@ func TestAuthValidateToken(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		2,
+		jwt.StandardClaims{
+			Issuer:    jwtIssuer,
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = float64(2)
 
 	token.SignedString([]byte("secret"))
 
@@ -180,17 +183,18 @@ func TestAuthValidateTokenNoUser(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := jwt.StandardClaims{
+		Issuer:    jwtIssuer,
+		IssuedAt:  now.Unix(),
+		NotBefore: now.Unix(),
+		ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
 
 	token.SignedString([]byte("secret"))
 
@@ -210,18 +214,21 @@ func TestAuthValidateTokenBadUser(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		1,
+		jwt.StandardClaims{
+			Issuer:    jwtIssuer,
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = float64(1)
 
 	token.SignedString([]byte("secret"))
 
@@ -241,16 +248,20 @@ func TestAuthValidateTokenNoIssuer(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		2,
+		jwt.StandardClaims{
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
 
 	token.SignedString([]byte("secret"))
 
@@ -270,17 +281,21 @@ func TestAuthValidateTokenBadIssuer(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		2,
+		jwt.StandardClaims{
+			Issuer:    "derp",
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = "derp"
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
 
 	token.SignedString([]byte("secret"))
 
@@ -328,18 +343,21 @@ func TestAuthTokenBadNBF(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		2,
+		jwt.StandardClaims{
+			Issuer:    jwtIssuer,
+			IssuedAt:  now.Unix(),
+			NotBefore: now.AddDate(0, 1, 0).Unix(),
+			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.AddDate(0, 1, 0).Unix()
-	token.Claims[jwtClaimExpire] = now.Add(time.Hour * 24 * jwtExpireDays).Unix()
-	token.Claims[jwtClaimUserID] = float64(2)
 
 	tkn, err := token.SignedString([]byte("secret"))
 	assert.NoError(t, err, "An error was not expected")
@@ -369,18 +387,21 @@ func TestAuthTokenExpired(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
+	claims := TokenClaims{
+		2,
+		jwt.StandardClaims{
+			Issuer:    jwtIssuer,
+			IssuedAt:  now.Unix(),
+			NotBefore: now.Unix(),
+			ExpiresAt: now.AddDate(0, -1, 0).Unix(),
+		},
+	}
+
 	// Create the token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// set our header info
 	token.Header[jwtHeaderKeyID] = 1
-
-	// Set our claims
-	token.Claims[jwtClaimIssuer] = jwtIssuer
-	token.Claims[jwtClaimIssued] = now.Unix()
-	token.Claims[jwtClaimNotBefore] = now.Unix()
-	token.Claims[jwtClaimExpire] = now.AddDate(0, -1, 0).Unix()
-	token.Claims[jwtClaimUserID] = float64(2)
 
 	tkn, err := token.SignedString([]byte("secret"))
 	assert.NoError(t, err, "An error was not expected")
