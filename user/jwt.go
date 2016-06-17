@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -83,5 +84,46 @@ func MakeToken(secret string, uid uint) (newtoken string, err error) {
 	token.Header[jwtHeaderKeyID] = 1
 
 	return token.SignedString([]byte(secret))
+
+}
+
+// validateToken checks all the claims in the provided token
+func validateToken(token *jwt.Token, user *User) ([]byte, error) {
+
+	// check alg to make sure its hmac
+	_, ok := token.Method.(*jwt.SigningMethodHMAC)
+	if !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+
+	// get the claims from the token
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return nil, fmt.Errorf("Couldnt parse claims")
+	}
+
+	// get the issuer from claims
+	tokenIssuer := claims.Issuer
+
+	// check the issuer
+	if tokenIssuer != jwtIssuer {
+		return nil, fmt.Errorf("Incorrect issuer")
+	}
+
+	// get uid from token
+	tokenUID := claims.User
+
+	// set the user id
+	user.SetID(uint(tokenUID))
+	// set authenticated
+	user.SetAuthenticated()
+
+	// check that the user was actually authed
+	if !user.IsAuthenticated {
+		return nil, fmt.Errorf("User is not authenticated")
+	}
+
+	// compare with secret from settings
+	return []byte(Secret), nil
 
 }

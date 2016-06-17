@@ -167,7 +167,9 @@ func TestAuthValidateToken(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	out, err := validateToken(token, &user)
+	out, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, out, "Token should be returned")
 	}
@@ -198,7 +200,9 @@ func TestAuthValidateTokenNoUser(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	_, err := validateToken(token, &user)
+	_, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, fmt.Errorf("Couldnt find user id"), "Error should match")
 	}
@@ -232,7 +236,9 @@ func TestAuthValidateTokenBadUser(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	_, err := validateToken(token, &user)
+	_, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, fmt.Errorf("User is not authenticated"), "Error should match")
 	}
@@ -265,7 +271,9 @@ func TestAuthValidateTokenNoIssuer(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	_, err := validateToken(token, &user)
+	_, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, fmt.Errorf("Couldnt find issuer"), "Error should match")
 	}
@@ -299,7 +307,9 @@ func TestAuthValidateTokenBadIssuer(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	_, err := validateToken(token, &user)
+	_, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, fmt.Errorf("Incorrect issuer"), "Error should match")
 	}
@@ -317,7 +327,9 @@ func TestAuthValidateTokenBadSigningMethod(t *testing.T) {
 
 	token.SignedString([]byte("secret"))
 
-	_, err := validateToken(token, &user)
+	_, err := jwt.ParseWithClaims(token.Raw, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return validateToken(token, &user)
+	})
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, fmt.Errorf("Unexpected signing method: none"), "Error should match")
 	}
