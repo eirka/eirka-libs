@@ -55,9 +55,9 @@ func TestMakeTokenValidateOutput(t *testing.T) {
 
 	// get the claims from the token
 	claims, ok := out.Claims.(*TokenClaims)
-	assert.False(t, ok, "Should be true")
+	assert.True(t, ok, "Should be true")
 
-	assert.Equal(t, claims.User, 2, "Claim should match")
+	assert.Equal(t, claims.User, uint(2), "Claim should match")
 
 }
 
