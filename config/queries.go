@@ -127,6 +127,11 @@ func GetDatabaseSettings() {
 		panic(err)
 	}
 
+	// akismet has been configured
+	if Settings.Akismet.Key != "" {
+		Settings.Akismet.Configured = true
+	}
+
 	err = ps.QueryRow("sfs_confidence").Scan(&Settings.StopForumSpam.Confidence)
 	if err != nil {
 		panic(err)
@@ -150,6 +155,11 @@ func GetDatabaseSettings() {
 	err = ps.QueryRow("amazon_key").Scan(&Settings.Amazon.Key)
 	if err != nil {
 		panic(err)
+	}
+
+	// amazon has been configured
+	if Settings.Amazon.ID != "" && Settings.Amazon.Key != "" {
+		Settings.Amazon.Configured = true
 	}
 
 	err = ps.QueryRow("thread_postsperpage").Scan(&Settings.Limits.PostsPerPage)
@@ -220,6 +230,11 @@ func GetDatabaseSettings() {
 	err = ps.QueryRow("cloudflare_key").Scan(&Settings.CloudFlare.Key)
 	if err != nil {
 		panic(err)
+	}
+
+	// cloudflare has been configured
+	if Settings.CloudFlare.Key != "" {
+		Settings.CloudFlare.Configured = true
 	}
 
 	return

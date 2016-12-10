@@ -73,14 +73,16 @@ type Prim struct {
 
 // CloudFlare API settings
 type CloudFlare struct {
-	Key   string
-	Email string
+	Configured bool
+	Key        string
+	Email      string
 }
 
 // Akismet settings
 type Akismet struct {
-	Key  string
-	Host string
+	Configured bool
+	Key        string
+	Host       string
 }
 
 // StopForumSpam settings
@@ -90,10 +92,11 @@ type StopForumSpam struct {
 
 // Amazon holds API settings for Amazon
 type Amazon struct {
-	Region string
-	Bucket string
-	ID     string
-	Key    string
+	Configured bool
+	Region     string
+	Bucket     string
+	ID         string
+	Key        string
 }
 
 // Limits for various items
