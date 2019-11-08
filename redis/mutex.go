@@ -121,7 +121,7 @@ func (m *Mutex) Lock(key string) error {
 		}
 
 		// if the time is past then we will delete the key
-		until := time.Now().Add(expiry - time.Now().Sub(start) - time.Duration(int64(float64(expiry)*factor)) + 2*time.Millisecond)
+		until := time.Now().Add(expiry - time.Since(start) - time.Duration(int64(float64(expiry)*factor)) + 2*time.Millisecond)
 		if n >= m.Quorum && time.Now().Before(until) {
 			return nil
 		}

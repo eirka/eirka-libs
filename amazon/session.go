@@ -20,7 +20,8 @@ func New() (amazon *Amazon) {
 	creds := credentials.NewStaticCredentials(config.Settings.Amazon.ID, config.Settings.Amazon.Key, "")
 
 	// create our session
-	sess := session.New(&aws.Config{
+	// TODO: handle error
+	sess, _ := session.NewSession(&aws.Config{
 		Region:      aws.String(config.Settings.Amazon.Region),
 		Credentials: creds,
 		MaxRetries:  aws.Int(10),

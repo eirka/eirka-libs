@@ -41,7 +41,6 @@ func TestAuthSecret(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/")
@@ -91,7 +90,6 @@ func TestAuthToken(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/")
@@ -335,7 +333,6 @@ func TestAuthTokenBadNBF(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	// the current timestamp
@@ -379,7 +376,6 @@ func TestAuthTokenExpired(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	// the current timestamp

@@ -30,7 +30,6 @@ func TestProtect(t *testing.T) {
 
 	router.GET("/important/:ib", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/important/1")

@@ -65,7 +65,6 @@ func DefaultUser() User {
 // SetID sets the user id
 func (u *User) SetID(uid uint) {
 	u.ID = uid
-	return
 }
 
 // SetAuthenticated sets a user as authenticated
@@ -76,7 +75,6 @@ func (u *User) SetAuthenticated() {
 	}
 
 	u.IsAuthenticated = true
-	return
 }
 
 // IsValid will check user struct validity

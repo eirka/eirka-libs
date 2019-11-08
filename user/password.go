@@ -96,7 +96,7 @@ func UpdatePassword(hash []byte, uid uint) (err error) {
 	}
 
 	// hash cant be empty
-	if hash == nil || len(hash) == 0 {
+	if len(hash) == 0 {
 		return e.ErrInvalidPassword
 	}
 

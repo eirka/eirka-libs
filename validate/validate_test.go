@@ -11,11 +11,6 @@ import (
 	"github.com/eirka/eirka-libs/config"
 )
 
-var (
-	csrfCookie   *http.Cookie
-	sessionToken string
-)
-
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, path, nil)
 	w := httptest.NewRecorder()
@@ -36,7 +31,6 @@ func TestValidateParams(t *testing.T) {
 
 	router.GET("/index/:id", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/index/test")

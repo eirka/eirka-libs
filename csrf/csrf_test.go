@@ -58,12 +58,10 @@ func TestCsrfVerify(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	router.POST("/reply", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/")
@@ -87,7 +85,6 @@ func TestCsrfCookie(t *testing.T) {
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	first := performRequest(router, "GET", "/")
@@ -129,7 +126,6 @@ func TestCsrfVerifyHeader(t *testing.T) {
 
 	router.POST("/reply", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	badrequest := performCsrfHeaderRequest(router, "POST", "/reply", "badtoken")
@@ -153,7 +149,6 @@ func TestCsrfVerifyForm(t *testing.T) {
 
 	router.POST("/reply", func(c *gin.Context) {
 		c.String(200, "OK")
-		return
 	})
 
 	badrequest := performCsrfFormRequest(router, "POST", "/reply", "badtoken")

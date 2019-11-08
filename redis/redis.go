@@ -60,7 +60,6 @@ func (r *Redis) NewRedisCache() {
 		Cache.Pool,
 	})
 
-	return
 }
 
 // NewRedisMock returns a fake redis pool for testing
@@ -79,5 +78,4 @@ func NewRedisMock() {
 		Cache.Pool,
 	})
 
-	return
 }

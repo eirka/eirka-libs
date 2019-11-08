@@ -237,6 +237,4 @@ func GetDatabaseSettings() {
 		Settings.CloudFlare.Configured = true
 	}
 
-	return
-
 }

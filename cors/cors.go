@@ -61,7 +61,6 @@ func SetDomains(domains, methods []string) {
 	// set methods
 	defaultAllowMethods = methods
 
-	return
 }
 
 // Check if origin is allowed
