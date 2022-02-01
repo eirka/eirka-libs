@@ -3,8 +3,8 @@ package user
 import (
 	"net/http"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	jwt "github.com/golang-jwt/jwt/v4"
 
 	e "github.com/eirka/eirka-libs/errors"
 )

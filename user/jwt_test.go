@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	e "github.com/eirka/eirka-libs/errors"
+	jwt "github.com/golang-jwt/jwt/v4"
 )
 
 func TestMakeToken(t *testing.T) {
