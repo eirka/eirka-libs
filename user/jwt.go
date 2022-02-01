@@ -93,13 +93,13 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 	// check alg to make sure its hmac
 	_, ok := token.Method.(*jwt.SigningMethodHMAC)
 	if !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 
 	// get the claims from the token
 	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
-		return nil, fmt.Errorf("Couldnt parse claims")
+		return nil, fmt.Errorf("couldnt parse claims")
 	}
 
 	// get the issuer from claims
@@ -107,7 +107,7 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 
 	// check the issuer
 	if tokenIssuer != jwtIssuer {
-		return nil, fmt.Errorf("Incorrect issuer")
+		return nil, fmt.Errorf("incorrect issuer")
 	}
 
 	// get uid from token
@@ -120,7 +120,7 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 
 	// check that the user was actually authed
 	if !user.IsAuthenticated {
-		return nil, fmt.Errorf("User is not authenticated")
+		return nil, fmt.Errorf("user is not authenticated")
 	}
 
 	// compare with secret from settings

@@ -175,11 +175,7 @@ func (m *Mutex) Unlock(key string) bool {
 		n++
 	}
 
-	if n >= m.Quorum {
-		return true
-	}
-
-	return false
+	return n >= m.Quorum
 }
 
 // checks to see if the key data matches our current lock, and deletes if so
