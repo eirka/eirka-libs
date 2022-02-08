@@ -55,6 +55,7 @@ type Config struct {
 	CloudFlare    CloudFlare
 	Akismet       Akismet
 	StopForumSpam StopForumSpam
+	Scamalytics   Scamalytics
 	Amazon        Amazon
 	Limits        Limits
 }
@@ -88,6 +89,15 @@ type Akismet struct {
 // StopForumSpam settings
 type StopForumSpam struct {
 	Confidence float64
+}
+
+// Scamalytics settings
+type Scamalytics struct {
+	Configured bool
+	Key        string
+	Endpoint   string
+	Path       string
+	Score      int
 }
 
 // Amazon holds API settings for Amazon

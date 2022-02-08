@@ -65,6 +65,7 @@ var (
 	ErrTokenInvalid     = errors.New("invalid token")
 	ErrUserNotValid     = errors.New("user is not valid")
 	ErrCsrfNotValid     = errors.New("csrf token is not valid")
+	ErrBlacklist        = errors.New("ip is on blacklist")
 )
 
 // RequestError holds the message string and http code

@@ -132,6 +132,31 @@ func GetDatabaseSettings() {
 		Settings.Akismet.Configured = true
 	}
 
+	err = ps.QueryRow("scamalytics_key").Scan(&Settings.Scamalytics.Key)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("scamalytics_endpoint").Scan(&Settings.Scamalytics.Endpoint)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("scamalytics_path").Scan(&Settings.Scamalytics.Path)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ps.QueryRow("scamalytics_score").Scan(&Settings.Scamalytics.Score)
+	if err != nil {
+		panic(err)
+	}
+
+	// scamalytics has been configured
+	if Settings.Scamalytics.Key != "" {
+		Settings.Scamalytics.Configured = true
+	}
+
 	err = ps.QueryRow("sfs_confidence").Scan(&Settings.StopForumSpam.Confidence)
 	if err != nil {
 		panic(err)
