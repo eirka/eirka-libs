@@ -76,6 +76,21 @@ func TestValidate(t *testing.T) {
 
 	assert.Equal(t, weird2.Input, "hello this is long but invalid because of the first two chars", "Should be the same")
 
+	maxpartslength1 := Validate{
+		Input: "hi",
+		Max:   100,
+		Min:   3,
+	}
+
+	assert.True(t, maxpartslength1.MinPartsLength(), "Should be true")
+
+	maxpartlength2 := Validate{
+		Input: "",
+		Max:   100,
+		Min:   3,
+	}
+
+	assert.True(t, maxpartlength2.MinPartsLength(), "Should be true")
 }
 
 func TestClamp(t *testing.T) {

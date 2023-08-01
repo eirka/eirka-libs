@@ -148,11 +148,11 @@ func TestAuthValidateToken(t *testing.T) {
 
 	claims := TokenClaims{
 		2,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    jwtIssuer,
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
@@ -185,11 +185,11 @@ func TestAuthValidateTokenNoUser(t *testing.T) {
 	// the current timestamp
 	now := time.Now()
 
-	claims := jwt.StandardClaims{
+	claims := jwt.RegisteredClaims{
 		Issuer:    jwtIssuer,
-		IssuedAt:  now.Unix(),
-		NotBefore: now.Unix(),
-		ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		IssuedAt:  jwt.NewNumericDate(now),
+		NotBefore: jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 	}
 
 	// Create the token
@@ -221,11 +221,11 @@ func TestAuthValidateTokenBadUser(t *testing.T) {
 
 	claims := TokenClaims{
 		1,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    jwtIssuer,
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
@@ -258,10 +258,10 @@ func TestAuthValidateTokenNoIssuer(t *testing.T) {
 
 	claims := TokenClaims{
 		2,
-		jwt.StandardClaims{
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+		jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
@@ -294,11 +294,11 @@ func TestAuthValidateTokenBadIssuer(t *testing.T) {
 
 	claims := TokenClaims{
 		2,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    "derp",
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
@@ -340,11 +340,11 @@ func TestAuthTokenBadNBF(t *testing.T) {
 
 	claims := TokenClaims{
 		2,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    jwtIssuer,
-			IssuedAt:  now.Unix(),
-			NotBefore: now.AddDate(0, 1, 0).Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now.AddDate(0, 1, 0)),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
@@ -383,11 +383,11 @@ func TestAuthTokenExpired(t *testing.T) {
 
 	claims := TokenClaims{
 		2,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    jwtIssuer,
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.AddDate(0, -1, 0).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.AddDate(0, -1, 0)),
 		},
 	}
 

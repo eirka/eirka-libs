@@ -21,7 +21,7 @@ const (
 // TokenClaims holds the custom and standard claims for the JWT token
 type TokenClaims struct {
 	User uint `json:"user_id"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // CreateToken will make a JWT token associated with a user
@@ -69,11 +69,11 @@ func MakeToken(secret string, uid uint) (newtoken string, err error) {
 
 	claims := TokenClaims{
 		uid,
-		jwt.StandardClaims{
+		jwt.RegisteredClaims{
 			Issuer:    jwtIssuer,
-			IssuedAt:  now.Unix(),
-			NotBefore: now.Unix(),
-			ExpiresAt: now.Add(time.Hour * 24 * jwtExpireDays).Unix(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24 * jwtExpireDays)),
 		},
 	}
 
