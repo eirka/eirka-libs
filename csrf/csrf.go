@@ -15,8 +15,8 @@ const (
 	FormFieldName = "csrf_token"
 	// CookieName is the name of CSRF cookie
 	CookieName = "csrf_token"
-	// SessionName the name of the session cookie for angularjs
-	SessionName = "XSRF-TOKEN"
+	// SessionCookieName the name of the session cookie for angularjs
+	SessionCookieName = "XSRF-TOKEN"
 )
 
 // skip these methods
@@ -66,7 +66,7 @@ func Cookie() gin.HandlerFunc {
 
 		// set the users csrf token tookie
 		sessionCookie := &http.Cookie{
-			Name:  SessionName,
+			Name:  SessionCookieName,
 			Value: sessionToken,
 			Path:  "/",
 		}
@@ -109,6 +109,14 @@ func Verify() gin.HandlerFunc {
 		// Then POST values
 		if len(sentToken) == 0 {
 			sentToken = c.PostForm(FormFieldName)
+		}
+
+		// Then the CSFF session cookie
+		if len(sentToken) == 0 {
+			sessionCookie, err := c.Request.Cookie(SessionCookieName)
+			if err == nil {
+				sentToken = sessionCookie.Value
+			}
 		}
 
 		// error if there was no csrf token or it isnt verified

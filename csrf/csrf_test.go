@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	csrfCookie   *http.Cookie
-	sessionToken string
+	sessionCookie *http.Cookie
+	csrfCookie    *http.Cookie
+	sessionToken  string
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
@@ -42,6 +43,19 @@ func performCsrfFormRequest(r http.Handler, method, path, token string) *httptes
 	req, _ := http.NewRequest(method, path, &b)
 	req.AddCookie(csrfCookie)
 	req.Header.Set("Content-Type", mw.FormDataContentType())
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w
+}
+
+func performCsrfSessionCookieRequest(r http.Handler, method, path string, cookie bool) *httptest.ResponseRecorder {
+	req, _ := http.NewRequest(method, path, nil)
+
+	if cookie {
+		req.AddCookie(sessionCookie)
+	}
+
+	req.AddCookie(csrfCookie)
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	return w
@@ -107,10 +121,11 @@ func TestCsrfCookie(t *testing.T) {
 		csrfCookie = userCookie
 	}
 
-	sessionCookie, err := request.Cookie(SessionName)
+	sCookie, err := request.Cookie(SessionCookieName)
 	if assert.NoError(t, err, "An error was not expected") {
-		assert.Contains(t, sessionCookie.String(), SessionName, "Response must include session cookie")
-		sessionToken = sessionCookie.Value
+		assert.Contains(t, sCookie.String(), SessionCookieName, "Response must include session cookie")
+		sessionToken = sCookie.Value
+		sessionCookie = sCookie
 	}
 
 }
@@ -156,6 +171,29 @@ func TestCsrfVerifyForm(t *testing.T) {
 	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
 
 	goodrequest := performCsrfFormRequest(router, "POST", "/reply", sessionToken)
+
+	assert.Equal(t, goodrequest.Code, 200, "HTTP request code should match")
+
+}
+
+func TestCsrfVerifySessionCookiePost(t *testing.T) {
+
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+
+	// posts need to be verified
+	router.Use(Verify())
+
+	router.POST("/reply", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	badrequest := performCsrfSessionCookieRequest(router, "POST", "/reply", false)
+
+	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
+
+	goodrequest := performCsrfSessionCookieRequest(router, "POST", "/reply", true)
 
 	assert.Equal(t, goodrequest.Code, 200, "HTTP request code should match")
 
