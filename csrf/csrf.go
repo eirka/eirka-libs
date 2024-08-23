@@ -111,12 +111,20 @@ func Verify() gin.HandlerFunc {
 			sentToken = c.PostForm(FormFieldName)
 		}
 
-		// Then the CSFF session cookie
+		// Then the CSRF session cookie
 		if len(sentToken) == 0 {
 			sessionCookie, err := c.Request.Cookie(SessionCookieName)
 			if err == nil {
 				sentToken = sessionCookie.Value
 			}
+		}
+
+		// sentToken should never be empty at this point so abort
+		if len(sentToken) == 0 {
+			c.JSON(e.ErrorMessage(e.ErrForbidden))
+			c.Error(e.ErrCsrfNotValid).SetMeta("csrf.Verify: No CSRF token found")
+			c.Abort()
+			return
 		}
 
 		// error if there was no csrf token or it isnt verified

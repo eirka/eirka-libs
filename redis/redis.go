@@ -2,11 +2,27 @@ package redis
 
 import (
 	"errors"
+	"sync/atomic"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/rafaeljusto/redigomock"
 )
+
+var cacheInitialized atomic.Uint32
+
+// SetCacheInitialized marks the cache as initialized
+func SetCacheInitialized() {
+	cacheInitialized.Store(1)
+}
+
+// isCacheInitialized checks if the cache has been initialized
+func isCacheInitialized() bool {
+	return cacheInitialized.Load() == 1
+}
+
+// ErrCacheNotInitialized is returned when Cache is not yet initialized
+var ErrCacheNotInitialized = errors.New("redis cache not initialized")
 
 // Pool is a generic connection pool
 type Pool interface {
@@ -60,6 +76,7 @@ func (r *Redis) NewRedisCache() {
 		Cache.Pool,
 	})
 
+	SetCacheInitialized()
 }
 
 // NewRedisMock returns a fake redis pool for testing
@@ -78,4 +95,5 @@ func NewRedisMock() {
 		Cache.Pool,
 	})
 
+	SetCacheInitialized()
 }

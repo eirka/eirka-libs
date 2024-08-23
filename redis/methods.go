@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"errors"
+
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -33,6 +35,14 @@ func (c *Store) Unlock(key string) bool {
 
 // Get will retrieve a key
 func (c *Store) Get(key string) ([]byte, error) {
+	if key == "" {
+		return nil, errors.New("key cannot be empty")
+	}
+
+	if !isCacheInitialized() {
+		return nil, ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -45,11 +55,22 @@ func (c *Store) Get(key string) ([]byte, error) {
 	}
 
 	return result, nil
-
 }
 
 // HGet will retrieve a hash
 func (c *Store) HGet(key string, value string) ([]byte, error) {
+	if key == "" {
+		return nil, errors.New("key cannot be empty")
+	}
+
+	if value == "" {
+		return nil, errors.New("value cannot be empty")
+	}
+
+	if !isCacheInitialized() {
+		return nil, ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -62,11 +83,18 @@ func (c *Store) HGet(key string, value string) ([]byte, error) {
 	}
 
 	return result, nil
-
 }
 
 // Set will set a single record
 func (c *Store) Set(key string, result []byte) (err error) {
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -77,6 +105,18 @@ func (c *Store) Set(key string, result []byte) (err error) {
 
 // SetEx will set a single record with an expiration
 func (c *Store) SetEx(key string, timeout uint, result []byte) (err error) {
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
+	if timeout == 0 {
+		return errors.New("timeout must be greater than 0")
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -87,6 +127,18 @@ func (c *Store) SetEx(key string, timeout uint, result []byte) (err error) {
 
 // HMSet will set a hash
 func (c *Store) HMSet(key string, value string, result []byte) (err error) {
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
+	if value == "" {
+		return errors.New("value cannot be empty")
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -97,6 +149,14 @@ func (c *Store) HMSet(key string, value string, result []byte) (err error) {
 
 // Delete will delete a key
 func (c *Store) Delete(key ...interface{}) (err error) {
+	if len(key) == 0 {
+		return errors.New("at least one key must be provided")
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -107,6 +167,11 @@ func (c *Store) Delete(key ...interface{}) (err error) {
 
 // Flush will call flushall and delete all keys
 func (c *Store) Flush() (err error) {
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -117,6 +182,14 @@ func (c *Store) Flush() (err error) {
 
 // Incr will increment a redis key
 func (c *Store) Incr(key string) (result int, err error) {
+	if key == "" {
+		return 0, errors.New("key cannot be empty")
+	}
+
+	if !isCacheInitialized() {
+		return 0, ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 
@@ -125,6 +198,18 @@ func (c *Store) Incr(key string) (result int, err error) {
 
 // Expire will set expire on a redis key
 func (c *Store) Expire(key string, timeout uint) (err error) {
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
+	if timeout == 0 {
+		return errors.New("timeout must be greater than 0")
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
+	}
+
 	conn := c.Pool.Get()
 	defer conn.Close()
 

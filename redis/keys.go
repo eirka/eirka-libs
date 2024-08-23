@@ -114,6 +114,10 @@ func (r *Key) Get() (result []byte, err error) {
 		return nil, ErrKeyNotSet
 	}
 
+	if !isCacheInitialized() {
+		return nil, ErrCacheNotInitialized
+	}
+
 	if r.hash {
 		return Cache.HGet(r.key, r.hashid)
 	}
@@ -127,6 +131,10 @@ func (r *Key) Set(data []byte) (err error) {
 
 	if !r.keyset {
 		return ErrKeyNotSet
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
 	}
 
 	if r.hash {
@@ -156,6 +164,10 @@ func (r *Key) Delete() (err error) {
 
 	if !r.keyset {
 		return ErrKeyNotSet
+	}
+
+	if !isCacheInitialized() {
+		return ErrCacheNotInitialized
 	}
 
 	err = Cache.Delete(r.key)

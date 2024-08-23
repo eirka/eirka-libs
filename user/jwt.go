@@ -113,8 +113,14 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 	// get uid from token
 	tokenUID := claims.User
 
+	// the user id should never be 0 or 1
+	if claims.User == 0 || claims.User == 1 {
+		return nil, fmt.Errorf("invalid user id")
+	}
+
 	// set the user id
 	user.SetID(uint(tokenUID))
+
 	// set authenticated
 	user.SetAuthenticated()
 

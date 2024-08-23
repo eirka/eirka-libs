@@ -56,6 +56,11 @@ func (v *Validate) MinPartsLength() bool {
 	// break up into fields
 	parts := strings.Fields(v.Input)
 
+	// Check if parts is empty
+	if len(parts) == 0 {
+		return true
+	}
+
 	// check if the first part is min chars for search
 	if len(parts[0]) < v.Min {
 		return true

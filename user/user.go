@@ -151,6 +151,7 @@ func (u *User) FromName(name string) (err error) {
 		return
 	}
 
+	// A user needs to be authenticated before IsValid() is called
 	u.SetAuthenticated()
 
 	if !u.IsValid() {

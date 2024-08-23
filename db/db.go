@@ -27,6 +27,10 @@ type Database struct {
 func (d *Database) NewDb() {
 	var err error
 
+	if db != nil {
+		panic(fmt.Errorf("database connection already initialized"))
+	}
+
 	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true",
 		d.User,
 		d.Password,
@@ -35,7 +39,7 @@ func (d *Database) NewDb() {
 		d.Database,
 	))
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to open database: %w", err))
 	}
 
 	// set max open connections
@@ -46,9 +50,8 @@ func (d *Database) NewDb() {
 	// try connecting to the database
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to ping database: %w", err))
 	}
-
 }
 
 // NewTestDb gets a database mock for testing
@@ -64,10 +67,34 @@ func CloseDb() (err error) {
 
 // GetDb returns a connection to MySQL
 func GetDb() (*sql.DB, error) {
+	if db == nil {
+		return nil, fmt.Errorf("database connection not initialized")
+	}
+
 	return db, nil
 }
 
 // GetTransaction will return a transaction
 func GetTransaction() (*sql.Tx, error) {
-	return db.Begin()
+	if db == nil {
+		return nil, fmt.Errorf("database connection not initialized")
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	return tx, nil
+}
+
+// Ping checks if the database connection is alive
+func Ping() bool {
+	if db == nil {
+		return false
+	}
+
+	err := db.Ping()
+
+	return err == nil
 }
