@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	e "github.com/eirka/eirka-libs/errors"
-	jwt "github.com/golang-jwt/jwt/v4"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 func TestMakeToken(t *testing.T) {
