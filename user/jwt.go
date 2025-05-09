@@ -6,6 +6,7 @@ import (
 
 	jwt "github.com/golang-jwt/jwt/v5"
 
+	"github.com/eirka/eirka-libs/config"
 	e "github.com/eirka/eirka-libs/errors"
 )
 
@@ -26,7 +27,6 @@ type TokenClaims struct {
 
 // CreateToken will make a JWT token associated with a user
 func (u *User) CreateToken() (newtoken string, err error) {
-
 	// check user struct validity
 	if !u.IsValid() {
 		err = e.ErrUserNotValid
@@ -45,17 +45,15 @@ func (u *User) CreateToken() (newtoken string, err error) {
 		return
 	}
 
-	return MakeToken(Secret, u.ID)
-
+	return MakeToken(u.ID)
 }
 
 // MakeToken will create a JWT token
-func MakeToken(secret string, uid uint) (newtoken string, err error) {
-
-	// error if theres no secret set
-	if secret == "" {
-		err = e.ErrNoSecret
-		return
+func MakeToken(uid uint) (newtoken string, err error) {
+	// Get the new secret for signing
+	secret, err := GetPrimarySecret()
+	if err != nil {
+		return "", err
 	}
 
 	// a token should never be created for these users
@@ -84,12 +82,11 @@ func MakeToken(secret string, uid uint) (newtoken string, err error) {
 	token.Header[jwtHeaderKeyID] = 1
 
 	return token.SignedString([]byte(secret))
-
 }
 
-// validateToken checks all the claims in the provided token
-func validateToken(token *jwt.Token, user *User) ([]byte, error) {
-
+// validateToken checks all the claims in the provided token and returns the appropriate secret
+// for token validation. It also updates the user object with information from the token.
+func validateToken(token *jwt.Token, user *User) (interface{}, error) {
 	// check alg to make sure its hmac
 	_, ok := token.Method.(*jwt.SigningMethodHMAC)
 	if !ok {
@@ -99,7 +96,7 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 	// get the claims from the token
 	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
-		return nil, fmt.Errorf("couldnt parse claims")
+		return nil, fmt.Errorf("couldn't parse claims")
 	}
 
 	// get the issuer from claims
@@ -129,7 +126,11 @@ func validateToken(token *jwt.Token, user *User) ([]byte, error) {
 		return nil, fmt.Errorf("user is not authenticated")
 	}
 
-	// compare with secret from settings
-	return []byte(Secret), nil
+	// Get the new secret for validation
+	// The Auth middleware will try with old secret if this fails
+	if config.Settings.Session.NewSecret == "" {
+		return nil, e.ErrNoSecret
+	}
 
+	return []byte(config.Settings.Session.NewSecret), nil
 }

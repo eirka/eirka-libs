@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 
+	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 )
@@ -108,9 +109,17 @@ func TestIsValidName(t *testing.T) {
 
 }
 
+// resetUserTestConfig resets the config for user tests
+func resetUserTestConfig() {
+	config.Settings.Session.NewSecret = ""
+	config.Settings.Session.OldSecret = ""
+}
+
 func TestUserPassword(t *testing.T) {
 
-	Secret = "secret"
+	// Reset and set up config
+	resetUserTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -136,11 +145,15 @@ func TestUserPassword(t *testing.T) {
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
+	// Reset config
+	resetUserTestConfig()
 }
 
 func TestUserBadPassword(t *testing.T) {
 
-	Secret = "secret"
+	// Reset and set up config
+	resetUserTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -166,11 +179,15 @@ func TestUserBadPassword(t *testing.T) {
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
+	// Reset config
+	resetUserTestConfig()
 }
 
 func TestFromName(t *testing.T) {
 
-	Secret = "secret"
+	// Reset and set up config
+	resetUserTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 
@@ -195,11 +212,15 @@ func TestFromName(t *testing.T) {
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
+	// Reset config
+	resetUserTestConfig()
 }
 
 func TestFromNameEmptyName(t *testing.T) {
 
-	Secret = "secret"
+	// Reset and set up config
+	resetUserTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 
@@ -208,11 +229,15 @@ func TestFromNameEmptyName(t *testing.T) {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 	}
 
+	// Reset config
+	resetUserTestConfig()
 }
 
 func TestFromNameBadId(t *testing.T) {
 
-	Secret = "secret"
+	// Reset and set up config
+	resetUserTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 

@@ -9,43 +9,73 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/eirka/eirka-libs/config"
 	e "github.com/eirka/eirka-libs/errors"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-func TestMakeToken(t *testing.T) {
+func init() {
+	// Enable test mode for secret validation
+	SetTestMode(true)
+}
 
-	// secret must be set
-	token, err := MakeToken("", 2)
+// setupJwtTestConfig sets up the config for JWT tests
+func setupJwtTestConfig() {
+	// Set test mode
+	SetTestMode(true)
+
+	// Set a valid secret
+	config.Settings.Session.NewSecret = "secret"
+	config.Settings.Session.OldSecret = ""
+}
+
+// resetJwtTestConfig resets the config for JWT tests
+func resetJwtTestConfig() {
+	// Reset secrets
+	config.Settings.Session.NewSecret = ""
+	config.Settings.Session.OldSecret = ""
+}
+
+func TestMakeToken(t *testing.T) {
+	// Reset config
+	resetJwtTestConfig()
+
+	// No secret set
+	token, err := MakeToken(2)
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrNoSecret, "Error should match")
 		assert.Empty(t, token, "Token should be empty")
 	}
 
+	// Set a valid secret
+	config.Settings.Session.NewSecret = "secret"
+
 	// default user state should never get a token
-	token, err = MakeToken("secret", 0)
+	token, err = MakeToken(0)
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 		assert.Empty(t, token, "Token should be empty")
 	}
 
 	// a non authed user should never get a token
-	token, err = MakeToken("secret", 1)
+	token, err = MakeToken(1)
 	if assert.Error(t, err, "An error was expected") {
 		assert.Equal(t, err, e.ErrUserNotValid, "Error should match")
 		assert.Empty(t, token, "Token should be empty")
 	}
 
-	token, err = MakeToken("secret", 2)
+	token, err = MakeToken(2)
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, token, "Token should not be empty")
 	}
-
 }
 
 func TestMakeTokenValidateOutput(t *testing.T) {
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
-	token, err := MakeToken("secret", 2)
+	token, err := MakeToken(2)
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, token, "Token should not be empty")
 	}
@@ -62,12 +92,12 @@ func TestMakeTokenValidateOutput(t *testing.T) {
 	assert.True(t, ok, "Should be true")
 
 	assert.Equal(t, claims.User, uint(2), "Claim should match")
-
 }
 
 func TestCreateTokenAnonAuth(t *testing.T) {
-
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	invalidUser := DefaultUser()
 	invalidUser.SetID(1)
@@ -81,8 +111,9 @@ func TestCreateTokenAnonAuth(t *testing.T) {
 }
 
 func TestCreateTokenZeroAuth(t *testing.T) {
-
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	invalidUser := DefaultUser()
 	invalidUser.SetID(0)
@@ -96,8 +127,9 @@ func TestCreateTokenZeroAuth(t *testing.T) {
 }
 
 func TestCreateTokenZeroNoAuth(t *testing.T) {
-
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	invalidUser := DefaultUser()
 	invalidUser.SetID(0)
@@ -110,8 +142,9 @@ func TestCreateTokenZeroNoAuth(t *testing.T) {
 }
 
 func TestCreateTokenBadPassword(t *testing.T) {
-
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -135,12 +168,13 @@ func TestCreateTokenBadPassword(t *testing.T) {
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, token, "Token should not be empty")
 	}
-
 }
 
 // TestAlgorithmConfusionAttack verifies protection against algorithm confusion attacks
 func TestAlgorithmConfusionAttack(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -175,10 +209,12 @@ func TestAlgorithmConfusionAttack(t *testing.T) {
 
 // TestTokenTampering tests that modified tokens are rejected
 func TestTokenTampering(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	// Create a valid token
-	validToken, err := MakeToken(Secret, 2)
+	validToken, err := MakeToken(2)
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, validToken, "Token should not be empty")
 	}
@@ -212,17 +248,23 @@ func TestTokenTampering(t *testing.T) {
 
 // TestSensitiveDataInClaims ensures no sensitive data is included in token
 func TestSensitiveDataInClaims(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	// Create a valid token
-	validToken, err := MakeToken(Secret, 2)
+	validToken, err := MakeToken(2)
 	if assert.NoError(t, err, "An error was not expected") {
 		assert.NotEmpty(t, validToken, "Token should not be empty")
 	}
 
+	// Get the primary secret for verification
+	primarySecret, err := GetPrimarySecret()
+	assert.NoError(t, err)
+
 	// Parse the token without verification to examine claims
 	token, _ := jwt.ParseWithClaims(validToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(Secret), nil
+		return []byte(primarySecret), nil
 	})
 
 	// Get the claims
@@ -248,13 +290,10 @@ func TestSensitiveDataInClaims(t *testing.T) {
 	}
 }
 
-// TestCreateTokenNoSecret ensures proper error when Secret is not set
+// TestCreateTokenNoSecret ensures proper error when no secret is set
 func TestCreateTokenNoSecret(t *testing.T) {
-	// Save original secret to restore later
-	originalSecret := Secret
-
-	// Test with empty secret
-	Secret = ""
+	// Reset config
+	resetJwtTestConfig()
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -266,14 +305,13 @@ func TestCreateTokenNoSecret(t *testing.T) {
 		assert.Equal(t, e.ErrNoSecret, err, "Error should match")
 		assert.Empty(t, token, "Token should be empty")
 	}
-
-	// Restore original secret
-	Secret = originalSecret
 }
 
 // TestTokenTimeSkew tests token validity with time skew
 func TestTokenTimeSkew(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -295,7 +333,10 @@ func TestTokenTimeSkew(t *testing.T) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token.Header[jwtHeaderKeyID] = 1
 
-	futureToken, err := token.SignedString([]byte(Secret))
+	primarySecret, err := GetPrimarySecret()
+	assert.NoError(t, err)
+
+	futureToken, err := token.SignedString([]byte(primarySecret))
 	if assert.NoError(t, err, "An error was not expected") {
 		// Try to parse this token (should fail because NotBefore is in future)
 		_, err = jwt.ParseWithClaims(futureToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -310,7 +351,9 @@ func TestTokenTimeSkew(t *testing.T) {
 
 // TestTokenWithUnsupportedAlgorithm tests token validation with various unsupported algorithms
 func TestTokenWithUnsupportedAlgorithm(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -329,8 +372,11 @@ func TestTokenWithUnsupportedAlgorithm(t *testing.T) {
 	tokenValid.Claims = claims
 	tokenValid.Header[jwtHeaderKeyID] = 1
 
+	primarySecret, err := GetPrimarySecret()
+	assert.NoError(t, err)
+
 	// Sign a valid token first, to have a good reference
-	validTokenString, _ := tokenValid.SignedString([]byte(Secret))
+	validTokenString, _ := tokenValid.SignedString([]byte(primarySecret))
 
 	// Now let's create a new token with a different alg header
 	parts := strings.Split(validTokenString, ".")
@@ -375,7 +421,9 @@ func TestTokenWithUnsupportedAlgorithm(t *testing.T) {
 
 // TestInvalidTokenClaims tests validation with tampered or invalid claims
 func TestInvalidTokenClaims(t *testing.T) {
-	Secret = "secret"
+	// Reset and set up config
+	resetJwtTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	user := DefaultUser()
 	user.SetID(2)
@@ -435,7 +483,10 @@ func TestInvalidTokenClaims(t *testing.T) {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, tc.claims)
 			token.Header[jwtHeaderKeyID] = 1
 
-			tokenString, err := token.SignedString([]byte(Secret))
+			primarySecret, err := GetPrimarySecret()
+			assert.NoError(t, err)
+
+			tokenString, err := token.SignedString([]byte(primarySecret))
 			if err != nil {
 				t.Fatalf("Failed to sign token: %v", err)
 			}
@@ -452,3 +503,4 @@ func TestInvalidTokenClaims(t *testing.T) {
 		})
 	}
 }
+

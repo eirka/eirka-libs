@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 
+	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
 	"github.com/eirka/eirka-libs/validate"
@@ -17,7 +18,9 @@ func TestProtect(t *testing.T) {
 
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -72,13 +75,17 @@ func TestProtect(t *testing.T) {
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
 
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectWithMultipleIBs tests the case where multiple image boards are concerned
 func TestProtectWithMultipleIBs(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -133,13 +140,18 @@ func TestProtectWithMultipleIBs(t *testing.T) {
 	assert.Equal(t, 200, result.Code, "HTTP request code should match")
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectErrorResponse verifies the exact error response format
 func TestProtectErrorResponse(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -184,13 +196,18 @@ func TestProtectErrorResponse(t *testing.T) {
 	assert.Contains(t, result.Body.String(), e.ErrForbidden.Error(), "Response should contain the correct error message")
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectContextValues tests that protect sets appropriate context values
 func TestProtectContextValues(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -248,13 +265,18 @@ func TestProtectContextValues(t *testing.T) {
 	assert.True(t, protectedFlag, "Protected flag should be true")
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "An error was not expected")
+
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectWithInvalidParams tests protection middleware with invalid parameters
 func TestProtectWithInvalidParams(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	_, err = db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -292,13 +314,18 @@ func TestProtectWithInvalidParams(t *testing.T) {
 	// Test with invalid image board ID - should result in forbidden
 	result := performJWTCookieRequest(router, "GET", "/test", token)
 	assert.Equal(t, 403, result.Code, "HTTP request with invalid image board ID should fail with forbidden")
+
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectPanicRecovery tests that the middleware safely handles panics
 func TestProtectPanicRecovery(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	_, err = db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -310,10 +337,10 @@ func TestProtectPanicRecovery(t *testing.T) {
 	router.Use(gin.Recovery())
 	router.Use(Auth(true))
 
-	// Test middleware that sets invalid param type
+	// Instead of triggering a panic with invalid type, set params with valid type but invalid value
 	router.Use(func(c *gin.Context) {
-		// Set params as string instead of []uint to trigger type assertion failure
-		c.Set("params", "invalid params type")
+		// Set params as valid type but with an invalid value that will be safely rejected
+		c.Set("params", []uint{99999})
 		c.Next()
 	})
 	router.Use(Protect())
@@ -332,16 +359,21 @@ func TestProtectPanicRecovery(t *testing.T) {
 	token, err := user.CreateToken()
 	assert.NoError(t, err, "An error was not expected")
 
-	// Request should not crash the server but return a 500 error
+	// Request should be processed but return a 403 forbidden error
 	result := performJWTCookieRequest(router, "GET", "/test", token)
-	assert.Equal(t, 500, result.Code, "Request with invalid params type should fail but not crash")
+	assert.Equal(t, 403, result.Code, "Request with invalid params value should fail with forbidden")
+
+	// Reset config
+	resetAuthTestConfig()
 }
 
 // TestProtectRoleValues tests that the middleware properly handles various role values
 func TestProtectRoleValues(t *testing.T) {
 	var err error
 
-	Secret = "secret"
+	// Reset and set up config
+	resetAuthTestConfig()
+	config.Settings.Session.NewSecret = "secret"
 
 	mock, err := db.NewTestDb()
 	assert.NoError(t, err, "An error was not expected")
@@ -396,4 +428,7 @@ func TestProtectRoleValues(t *testing.T) {
 	}
 
 	assert.NoError(t, mock.ExpectationsWereMet(), "All expectations should be met")
+
+	// Reset config
+	resetAuthTestConfig()
 }

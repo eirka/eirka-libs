@@ -1,26 +1,24 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
 
+	"github.com/eirka/eirka-libs/config"
 	e "github.com/eirka/eirka-libs/errors"
 )
-
-// Secret holds the hmac secret, is set from main
-var Secret string
 
 // Auth is a gin middleware that checks for session cookie and
 // handles permissions
 func Auth(authenticated bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		// error if theres no secret set
-		if Secret == "" {
+		// Check if secrets are properly configured
+		if !IsInitialized() {
 			c.JSON(e.ErrorMessage(e.ErrInternalError))
-			c.Error(e.ErrNoSecret).SetMeta("auth.Auth")
+			c.Error(e.ErrNoSecret).SetMeta("auth.Auth.NoSecret")
 			c.Abort()
 			return
 		}
@@ -30,19 +28,72 @@ func Auth(authenticated bool) gin.HandlerFunc {
 
 		// try and get the jwt cookie from the request
 		cookie, err := c.Request.Cookie(CookieName)
+
 		// parse jwt token if its there
 		if err != http.ErrNoCookie {
-			token, err := jwt.ParseWithClaims(cookie.Value, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+			// Get all active secrets
+			secrets, err := GetSecrets()
+			if err != nil {
+				c.JSON(e.ErrorMessage(e.ErrInternalError))
+				c.Error(err).SetMeta("auth.Auth.GetSecrets")
+				c.Abort()
+				return
+			}
+
+			// First try with new secret (always the first one)
+			parseFunc := func(token *jwt.Token) (interface{}, error) {
 				return validateToken(token, &user)
-			})
-			// if theres some jwt error other than no token in request or the token is
-			// invalid then return unauth
-			// the client side should delete any saved JWT tokens on unauth error
-			if err != nil || !token.Valid {
+			}
+
+			token, parseErr := jwt.ParseWithClaims(cookie.Value, &TokenClaims{}, parseFunc)
+
+			// If token validation failed and old secret is available, try with it
+			if parseErr != nil && len(secrets) > 1 {
+				// Try with old secret directly
+				secondaryFunc := func(token *jwt.Token) (interface{}, error) {
+					// Validate algorithm
+					_, ok := token.Method.(*jwt.SigningMethodHMAC)
+					if !ok {
+						return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+					}
+
+					// Get claims
+					claims, ok := token.Claims.(*TokenClaims)
+					if !ok {
+						return nil, fmt.Errorf("couldn't parse claims")
+					}
+
+					// Validate claims
+					if claims.Issuer != jwtIssuer {
+						return nil, fmt.Errorf("incorrect issuer")
+					}
+
+					if claims.User == 0 || claims.User == 1 {
+						return nil, fmt.Errorf("invalid user id")
+					}
+
+					// Set user info
+					user.SetID(claims.User)
+					user.SetAuthenticated()
+
+					if !user.IsAuthenticated {
+						return nil, fmt.Errorf("user is not authenticated")
+					}
+
+					// Return old secret for validation
+					return []byte(config.Settings.Session.OldSecret), nil
+				}
+
+				// Try parsing with old secret
+				token, parseErr = jwt.ParseWithClaims(cookie.Value, &TokenClaims{}, secondaryFunc)
+			}
+
+			// If still invalid after all attempts
+			if parseErr != nil || !token.Valid {
 				// delete the cookie
 				http.SetCookie(c.Writer, DeleteCookie())
 				c.JSON(e.ErrorMessage(e.ErrUnauthorized))
-				c.Error(err).SetMeta("user.Auth")
+				c.Error(parseErr).SetMeta("user.Auth")
 				c.Abort()
 				return
 			}
@@ -63,7 +114,5 @@ func Auth(authenticated bool) gin.HandlerFunc {
 		c.Set("userdata", user)
 
 		c.Next()
-
 	}
-
 }

@@ -47,6 +47,8 @@ The repository is organized into domain-specific packages:
 1. **user**: User authentication, authorization, and management
    - Handles user creation, password hashing/validation, and permissions
    - Provides JWT token generation and validation
+   - Implements secret management with support for key rotation
+   - Auth middleware for validating JWT tokens with backward compatibility
 
 2. **db**: Database connection and transaction management
    - Connection pooling and initialization
@@ -61,6 +63,8 @@ The repository is organized into domain-specific packages:
 4. **config**: Application configuration
    - Various limits and settings for the application
    - Configuration for external services like Amazon S3
+   - Session configuration for JWT secret management
+   - Centralized configuration loading from `/etc/pram/pram.conf`
 
 5. **validate**: Request validation
    - Parameter validation for API requests
@@ -97,3 +101,5 @@ Tests follow a consistent pattern:
 3. **Middleware**: Packages like `csrf` and `validate` provide middleware functions designed to work with the Gin web framework.
 
 4. **Mocking**: The codebase extensively uses mocking for tests, particularly for database and Redis operations.
+
+5. **Secret Management**: JWT secrets are stored in the central configuration file and support rotation through a primary/secondary secret mechanism. The SecretManager ensures thread-safe access to secrets.
