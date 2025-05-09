@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -197,4 +198,185 @@ func TestCsrfVerifySessionCookiePost(t *testing.T) {
 
 	assert.Equal(t, goodrequest.Code, 200, "HTTP request code should match")
 
+}
+
+// Helper function for testing various HTTP methods with CSRF verification
+func performCsrfMethod(t *testing.T, method string, shouldPass bool) {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.Use(Verify())
+	router.Handle(method, "/endpoint", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	var resp *httptest.ResponseRecorder
+	if shouldPass {
+		// For GET/HEAD/OPTIONS/TRACE methods, we don't need the CSRF token
+		resp = performRequest(router, method, "/endpoint")
+	} else {
+		// For other methods without CSRF token should fail
+		resp = performRequest(router, method, "/endpoint")
+	}
+
+	if shouldPass {
+		assert.Equal(t, 200, resp.Code, "HTTP request code should be 200 for method "+method)
+	} else {
+		if method == "GET" || method == "HEAD" || method == "OPTIONS" || method == "TRACE" {
+			assert.Equal(t, 200, resp.Code, "HTTP request code should be 200 for skipped method "+method)
+		} else {
+			assert.Equal(t, 403, resp.Code, "HTTP request code should be 403 for method "+method+" without valid CSRF")
+		}
+	}
+}
+
+func TestCsrfMethodVerification(t *testing.T) {
+	// Test methods that should be skipped
+	performCsrfMethod(t, "GET", true)
+	performCsrfMethod(t, "HEAD", true)
+	performCsrfMethod(t, "OPTIONS", true)
+	performCsrfMethod(t, "TRACE", true)
+
+	// Test methods that should be verified
+	performCsrfMethod(t, "POST", false)
+	performCsrfMethod(t, "PUT", false)
+	performCsrfMethod(t, "DELETE", false)
+	performCsrfMethod(t, "PATCH", false)
+}
+
+// Test verifying an invalid cookie
+func TestCsrfInvalidCookie(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.Use(Verify())
+
+	router.POST("/reply", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	// Create a fake request with an invalid cookie
+	req, _ := http.NewRequest("POST", "/reply", nil)
+	invalidCookie := &http.Cookie{
+		Name:  CookieName,
+		Value: "invalidvalue",
+	}
+	req.AddCookie(invalidCookie)
+	req.Header.Set(HeaderName, sessionToken)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 403, w.Code, "HTTP request code should be 403 with invalid cookie")
+}
+
+// Test multiple CSRF cookies in the same request
+func TestCsrfMultipleCookies(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	// Generate CSRF cookies
+	router.Use(Cookie())
+	
+	router.GET("/test", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	// First request to get cookies
+	first := performRequest(router, "GET", "/test")
+	assert.Equal(t, 200, first.Code, "HTTP request code should match")
+
+	// Second request with cookies already set
+	req, _ := http.NewRequest("GET", "/test", nil)
+	req.AddCookie(csrfCookie)
+	req.AddCookie(sessionCookie)
+	
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code, "HTTP request code should match")
+
+	// Verify session cookie is always regenerated
+	sessionCookieFound := false
+	for _, cookie := range w.HeaderMap["Set-Cookie"] {
+		if strings.Contains(cookie, SessionCookieName) {
+			sessionCookieFound = true
+			break
+		}
+	}
+	assert.True(t, sessionCookieFound, "A session cookie should always be generated")
+}
+
+// Test cookie with invalid length
+func TestCsrfInvalidCookieLength(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.Use(Cookie())
+	
+	router.GET("/test", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	// Create a request with an invalid length cookie
+	req, _ := http.NewRequest("GET", "/test", nil)
+	invalidCookie := &http.Cookie{
+		Name:  CookieName,
+		Value: "tooShort", // Not a valid base64 encoded token
+	}
+	req.AddCookie(invalidCookie)
+	
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code, "HTTP request code should match")
+
+	// A new cookie should be generated
+	cookieFound := false
+	for _, cookie := range w.HeaderMap["Set-Cookie"] {
+		if cookie != invalidCookie.String() && cookie != sessionCookie.String() {
+			cookieFound = true
+			break
+		}
+	}
+	assert.True(t, cookieFound, "A new cookie should be generated when an invalid length cookie is provided")
+}
+
+// Test for empty token
+func TestCsrfEmptyToken(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.Use(Verify())
+
+	router.POST("/reply", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
+	// Create a request with no token
+	req, _ := http.NewRequest("POST", "/reply", nil)
+	req.AddCookie(csrfCookie)
+	// Deliberately not setting any CSRF tokens
+	
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 403, w.Code, "HTTP request code should be 403 with no CSRF token")
+}
+
+// Test for b64encode and b64decode functions
+func TestB64EncodeDecode(t *testing.T) {
+	testData := []byte("TestDataForEncoding12345")
+	
+	// Test encode
+	encoded := b64encode(testData)
+	assert.NotEmpty(t, encoded, "Encoded string should not be empty")
+	
+	// Test decode
+	decoded := b64decode(encoded)
+	assert.Equal(t, testData, decoded, "Decoded data should match original")
+	
+	// Test decode with invalid base64
+	invalidDecoded := b64decode("this is not valid base64!!!!!")
+	assert.Nil(t, invalidDecoded, "Invalid base64 should return nil")
 }
