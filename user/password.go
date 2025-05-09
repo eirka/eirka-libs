@@ -73,7 +73,7 @@ const (
 func generateRandomPassword(n int) string {
 	// byte slice to hold password
 	b := make([]byte, n)
-	
+
 	// Read random bytes
 	if _, err := io.ReadFull(rand.Reader, b); err != nil {
 		// If we can't generate random bytes, panic as this is a security issue

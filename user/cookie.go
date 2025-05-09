@@ -18,6 +18,8 @@ func CreateCookie(token string) *http.Cookie {
 		Expires:  time.Now().Add(90 * 24 * time.Hour),
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
 	}
 }
 
@@ -30,5 +32,7 @@ func DeleteCookie() *http.Cookie {
 		MaxAge:   -1,
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
 	}
 }
