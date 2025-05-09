@@ -1,19 +1,14 @@
 package user
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"io"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
 	e "github.com/eirka/eirka-libs/errors"
-)
-
-const (
-	// characters for random password generator
-	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 )
 
 // ComparePassword will compare the supplied password to the hash from the database
@@ -69,22 +64,29 @@ func RandomPassword() (password string, hash []byte, err error) {
 
 }
 
+const (
+	// characters for random password generator
+	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+)
+
 // will generate a password with random characters
 func generateRandomPassword(n int) string {
-
-	// random source
-	src := rand.NewSource(time.Now().UnixNano())
-
 	// byte slice to hold password
 	b := make([]byte, n)
+	
+	// Read random bytes
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		// If we can't generate random bytes, panic as this is a security issue
+		panic(err)
+	}
 
-	// range over byte slice and fill with random letters
-	for i := range b {
-		b[i] = letterBytes[src.Int63()%int64(len(letterBytes))]
+	// Map random bytes to letterBytes character set
+	letterLen := len(letterBytes)
+	for i := 0; i < n; i++ {
+		b[i] = letterBytes[int(b[i])%letterLen]
 	}
 
 	return string(b)
-
 }
 
 // UpdatePassword will update the user password hash in database
