@@ -10,51 +10,6 @@ import (
 	e "github.com/eirka/eirka-libs/errors"
 )
 
-// setupTestSecrets sets up the config secrets for testing
-func setupTestSecrets() {
-	// Make sure settings is initialized
-	if config.Settings == nil {
-		config.Settings = &config.Config{}
-	}
-
-	// Set test mode for secret validation
-	SetTestMode(true)
-
-	// Set secrets in config
-	config.Settings.Session.NewSecret = "new-test-secret"
-	config.Settings.Session.OldSecret = "old-test-secret"
-}
-
-// setupTestSecretsWithRotation sets up the config secrets for testing rotation
-func setupTestSecretsWithRotation() {
-	// Make sure settings is initialized
-	if config.Settings == nil {
-		config.Settings = &config.Config{}
-	}
-
-	// Set test mode for secret validation
-	SetTestMode(true)
-
-	// Set secrets in config for rotation
-	config.Settings.Session.NewSecret = "new-test-secret"
-	config.Settings.Session.OldSecret = "old-test-secret"
-}
-
-// setupTestSecretsNoRotation sets up the config with only a new secret
-func setupTestSecretsNoRotation() {
-	// Make sure settings is initialized
-	if config.Settings == nil {
-		config.Settings = &config.Config{}
-	}
-
-	// Set test mode for secret validation
-	SetTestMode(true)
-
-	// Set only new secret
-	config.Settings.Session.NewSecret = "new-test-secret"
-	config.Settings.Session.OldSecret = ""
-}
-
 // resetTestSecrets resets the config secrets for testing
 func resetTestSecrets() {
 	// Make sure settings is initialized

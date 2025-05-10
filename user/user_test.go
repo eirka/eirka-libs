@@ -698,7 +698,8 @@ func TestReservedNamesCaseInsensitive(t *testing.T) {
 		variations := []string{
 			strings.ToLower(reservedName),
 			strings.ToUpper(reservedName),
-			strings.Title(reservedName),
+			// Title case (first letter uppercase, rest lowercase)
+			strings.ToUpper(reservedName[:1]) + strings.ToLower(reservedName[1:]),
 			// Mix of cases
 			func() string {
 				mixed := []rune(reservedName)

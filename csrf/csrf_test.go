@@ -5,7 +5,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -106,12 +105,12 @@ func TestCsrfCookie(t *testing.T) {
 
 	assert.Equal(t, first.Code, 200, "HTTP request code should match")
 
-	assert.Contains(t, first.HeaderMap["Vary"], "Cookie", "Response must include Vary: Cookie header")
+	assert.Contains(t, first.Header().Get("Vary"), "Cookie", "Response must include Vary: Cookie header")
 
 	header := http.Header{}
 
-	for _, cookie := range first.HeaderMap["Set-Cookie"] {
-		header.Add("Cookie", cookie)
+	for _, cookie := range first.Result().Cookies() {
+		header.Add("Cookie", cookie.String())
 	}
 
 	request := http.Request{Header: header}
@@ -298,8 +297,8 @@ func TestCsrfMultipleCookies(t *testing.T) {
 
 	// Verify session cookie is always regenerated
 	sessionCookieFound := false
-	for _, cookie := range w.HeaderMap["Set-Cookie"] {
-		if strings.Contains(cookie, SessionCookieName) {
+	for _, cookie := range w.Result().Cookies() {
+		if cookie.Name == SessionCookieName {
 			sessionCookieFound = true
 			break
 		}
@@ -333,8 +332,8 @@ func TestCsrfInvalidCookieLength(t *testing.T) {
 
 	// A new cookie should be generated
 	cookieFound := false
-	for _, cookie := range w.HeaderMap["Set-Cookie"] {
-		if cookie != invalidCookie.String() && cookie != sessionCookie.String() {
+	for _, cookie := range w.Result().Cookies() {
+		if cookie.Name == CookieName && cookie.Value != invalidCookie.Value {
 			cookieFound = true
 			break
 		}

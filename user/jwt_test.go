@@ -19,16 +19,6 @@ func init() {
 	SetTestMode(true)
 }
 
-// setupJwtTestConfig sets up the config for JWT tests
-func setupJwtTestConfig() {
-	// Set test mode
-	SetTestMode(true)
-
-	// Set a valid secret
-	config.Settings.Session.NewSecret = "secret"
-	config.Settings.Session.OldSecret = ""
-}
-
 // resetJwtTestConfig resets the config for JWT tests
 func resetJwtTestConfig() {
 	// Reset secrets
@@ -503,4 +493,3 @@ func TestInvalidTokenClaims(t *testing.T) {
 		})
 	}
 }
-

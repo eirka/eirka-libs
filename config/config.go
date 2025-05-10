@@ -3,8 +3,8 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
-	"io/ioutil"
 )
 
 // Global config file path
@@ -81,7 +81,7 @@ func LoadConfig() error {
 	defer file.Close()
 
 	// Read the file content
-	configData, err := ioutil.ReadAll(file)
+	configData, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Printf("Error reading config file: %v\n", err)
 		return err

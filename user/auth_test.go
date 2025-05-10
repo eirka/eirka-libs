@@ -34,16 +34,6 @@ func performJWTCookieRequest(r http.Handler, method, path, token string) *httpte
 	return w
 }
 
-// setupAuthTestConfig sets up the config for auth tests
-func setupAuthTestConfig() {
-	// Enable test mode
-	SetTestMode(true)
-
-	// Set a valid secret
-	config.Settings.Session.NewSecret = "secret"
-	config.Settings.Session.OldSecret = ""
-}
-
 // resetAuthTestConfig resets the config for auth tests
 func resetAuthTestConfig() {
 	// Reset secrets
