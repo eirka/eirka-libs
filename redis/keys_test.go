@@ -201,20 +201,20 @@ func TestKeysGetCacheNotInitialized(t *testing.T) {
 	// Store the original state
 	originalCache := Cache
 	originalInitialized := cacheInitialized.Load()
-	
+
 	// Reset cache to test uninitialized state
 	Cache = Store{}
 	cacheInitialized.Store(0)
-	
+
 	key := NewKey("new")
 	key = key.SetKey("1")
 	key.keyset = true
-	
+
 	res, err := key.Get()
-	
+
 	assert.Empty(t, res, "Should not return data when cache not initialized")
 	assert.Equal(t, ErrCacheNotInitialized, err, "Error should be cache not initialized")
-	
+
 	// Restore original state
 	Cache = originalCache
 	cacheInitialized.Store(originalInitialized)
@@ -224,13 +224,13 @@ func TestKeysGetCacheNotInitialized(t *testing.T) {
 func TestKeysGetError(t *testing.T) {
 	key := NewKey("new")
 	key = key.SetKey("1")
-	
+
 	NewRedisMock()
-	
+
 	Cache.Mock.Command("GET", "new:1").ExpectError(errors.New("redis error"))
-	
+
 	res, err := key.Get()
-	
+
 	assert.Empty(t, res, "Should not return data on error")
 	assert.Error(t, err, "An error was expected")
 	assert.Equal(t, "redis error", err.Error(), "Error message should match")
@@ -240,13 +240,13 @@ func TestKeysGetError(t *testing.T) {
 func TestKeysGetCacheMiss(t *testing.T) {
 	key := NewKey("new")
 	key = key.SetKey("1")
-	
+
 	NewRedisMock()
-	
+
 	Cache.Mock.Command("GET", "new:1").Expect(nil)
-	
+
 	res, err := key.Get()
-	
+
 	assert.Empty(t, res, "Should not return data on cache miss")
 	assert.Equal(t, ErrCacheMiss, err, "Error should be cache miss")
 }
@@ -330,19 +330,19 @@ func TestKeysSetCacheNotInitialized(t *testing.T) {
 	// Store the original state
 	originalCache := Cache
 	originalInitialized := cacheInitialized.Load()
-	
+
 	// Reset cache to test uninitialized state
 	Cache = Store{}
 	cacheInitialized.Store(0)
-	
+
 	key := NewKey("new")
 	key = key.SetKey("1")
 	key.keyset = true
-	
+
 	err := key.Set([]byte("hello"))
-	
+
 	assert.Equal(t, ErrCacheNotInitialized, err, "Error should be cache not initialized")
-	
+
 	// Restore original state
 	Cache = originalCache
 	cacheInitialized.Store(originalInitialized)
@@ -352,14 +352,14 @@ func TestKeysSetCacheNotInitialized(t *testing.T) {
 func TestKeysSetExpireError(t *testing.T) {
 	key := NewKey("new")
 	key = key.SetKey("1")
-	
+
 	NewRedisMock()
-	
+
 	Cache.Mock.Command("SET", "new:1", []byte("hello"))
 	Cache.Mock.Command("EXPIRE", "new:1", redigomock.NewAnyData()).ExpectError(errors.New("expire error"))
-	
+
 	err := key.Set([]byte("hello"))
-	
+
 	assert.Error(t, err, "An error was expected")
 	assert.Equal(t, "expire error", err.Error(), "Error should be from EXPIRE command")
 }
@@ -368,15 +368,15 @@ func TestKeysSetExpireError(t *testing.T) {
 func TestKeysSetWithLock(t *testing.T) {
 	key := NewKey("index")
 	key = key.SetKey("1", "1")
-	
+
 	NewRedisMock()
-	
+
 	Cache.Mock.Command("HMSET", "index:1", "1", []byte("hello"))
 	// Expect a call to DEL for unlocking the mutex
 	Cache.Mock.Command("DEL", "index:1:mutex")
-	
+
 	err := key.Set([]byte("hello"))
-	
+
 	assert.NoError(t, err, "An error was not expected")
 }
 
@@ -440,9 +440,9 @@ func TestKeysDeleteLock(t *testing.T) {
 // Test Delete when Key is not set
 func TestKeysDeleteKeyNotSet(t *testing.T) {
 	key := NewKey("index")
-	
+
 	err := key.Delete()
-	
+
 	assert.Error(t, err, "An error was expected")
 	assert.Equal(t, ErrKeyNotSet, err, "Error should be key not set")
 }
@@ -452,19 +452,19 @@ func TestKeysDeleteCacheNotInitialized(t *testing.T) {
 	// Store the original state
 	originalCache := Cache
 	originalInitialized := cacheInitialized.Load()
-	
+
 	// Reset cache to test uninitialized state
 	Cache = Store{}
 	cacheInitialized.Store(0)
-	
+
 	key := NewKey("new")
 	key = key.SetKey("1")
 	key.keyset = true
-	
+
 	err := key.Delete()
-	
+
 	assert.Equal(t, ErrCacheNotInitialized, err, "Error should be cache not initialized")
-	
+
 	// Restore original state
 	Cache = originalCache
 	cacheInitialized.Store(originalInitialized)
@@ -492,32 +492,32 @@ func TestKeysDeleteLockError(t *testing.T) {
 func TestRedisKeysDefinitions(t *testing.T) {
 	// The test will simply verify that all predefined keys initialize correctly
 	// and can be used to generate keys
-	
+
 	// Define expected results keyed by base name
-	expectedResults := map[string]struct{
+	expectedResults := map[string]struct {
 		fieldCount int
 		hash       bool
 		expire     bool
 		lock       bool
 	}{
-		"index":      {1, true, false, true},
-		"thread":     {2, true, false, false},
-		"tag":        {2, true, true, false},
-		"image":      {1, true, false, false},
-		"post":       {2, true, false, false},
-		"tags":       {1, true, false, false},
-		"directory":  {1, true, false, false},
-		"new":        {1, false, true, false},
-		"popular":    {1, false, true, false},
-		"favorited":  {1, false, true, false},
-		"tagtypes":   {0, false, false, false},
-		"imageboards":{0, false, true, false},
+		"index":       {1, true, false, true},
+		"thread":      {2, true, false, false},
+		"tag":         {2, true, true, false},
+		"image":       {1, true, false, false},
+		"post":        {2, true, false, false},
+		"tags":        {1, true, false, false},
+		"directory":   {1, true, false, false},
+		"new":         {1, false, true, false},
+		"popular":     {1, false, true, false},
+		"favorited":   {1, false, true, false},
+		"tagtypes":    {0, false, false, false},
+		"imageboards": {0, false, true, false},
 	}
-	
+
 	// Verify each key definition matches the expected configuration
 	for base, expected := range expectedResults {
 		key := NewKey(base)
-		
+
 		assert.NotNil(t, key, "Key should be defined: "+base)
 		if key != nil {
 			assert.Equal(t, base, key.base, "Base name should match for "+base)
@@ -527,7 +527,7 @@ func TestRedisKeysDefinitions(t *testing.T) {
 			assert.Equal(t, expected.lock, key.lock, "Lock flag should match for "+base)
 		}
 	}
-	
+
 	// Verify RedisKeyIndex contains all keys
 	assert.Equal(t, len(expectedResults), len(RedisKeyIndex), "RedisKeyIndex should contain all defined keys")
 }
@@ -542,10 +542,10 @@ func TestStringEmptyKey(t *testing.T) {
 func TestSetKeyMultipleFields(t *testing.T) {
 	// Create a key with multiple fields (thread has fieldcount 2)
 	key := NewKey("thread")
-	
+
 	// Use fields with potential delimiters
 	key = key.SetKey("123", "456", "789")
-	
+
 	assert.Equal(t, "thread:123:456", key.key, "Key should properly join fields with delimiters")
 	assert.Equal(t, "789", key.hashid, "Hash ID should be set correctly")
 }
@@ -554,10 +554,10 @@ func TestSetKeyMultipleFields(t *testing.T) {
 func TestInitFunction(t *testing.T) {
 	// This test verifies that the init function properly maps all keys
 	// We check a few keys to ensure they were properly mapped
-	
+
 	// Check for some specific keys
 	keys := []string{"index", "thread", "tag", "image", "tagtypes"}
-	
+
 	for _, key := range keys {
 		mappedKey, exists := RedisKeyIndex[key]
 		assert.True(t, exists, "Key should exist in RedisKeyIndex: "+key)

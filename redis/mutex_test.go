@@ -166,13 +166,13 @@ func TestMutexConcurrent(t *testing.T) {
 			Quorum: 1,
 			nodes:  []Pool{Cache.Pool},
 		}
-		
+
 		err := tempMutex.Lock("concurrent:mutex")
-		
+
 		// This should fail because the mutex is already locked
 		assert.Error(t, err, "Second lock attempt should fail")
 		assert.Equal(t, ErrFailed, err, "Error should be ErrFailed")
-		
+
 		done <- true
 	}()
 

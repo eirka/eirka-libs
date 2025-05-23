@@ -276,7 +276,7 @@ func TestCsrfMultipleCookies(t *testing.T) {
 	router := gin.New()
 	// Generate CSRF cookies
 	router.Use(Cookie())
-	
+
 	router.GET("/test", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
@@ -289,7 +289,7 @@ func TestCsrfMultipleCookies(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/test", nil)
 	req.AddCookie(csrfCookie)
 	req.AddCookie(sessionCookie)
-	
+
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -312,7 +312,7 @@ func TestCsrfInvalidCookieLength(t *testing.T) {
 
 	router := gin.New()
 	router.Use(Cookie())
-	
+
 	router.GET("/test", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
@@ -324,7 +324,7 @@ func TestCsrfInvalidCookieLength(t *testing.T) {
 		Value: "tooShort", // Not a valid base64 encoded token
 	}
 	req.AddCookie(invalidCookie)
-	
+
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -356,7 +356,7 @@ func TestCsrfEmptyToken(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/reply", nil)
 	req.AddCookie(csrfCookie)
 	// Deliberately not setting any CSRF tokens
-	
+
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -366,15 +366,15 @@ func TestCsrfEmptyToken(t *testing.T) {
 // Test for b64encode and b64decode functions
 func TestB64EncodeDecode(t *testing.T) {
 	testData := []byte("TestDataForEncoding12345")
-	
+
 	// Test encode
 	encoded := b64encode(testData)
 	assert.NotEmpty(t, encoded, "Encoded string should not be empty")
-	
+
 	// Test decode
 	decoded := b64decode(encoded)
 	assert.Equal(t, testData, decoded, "Decoded data should match original")
-	
+
 	// Test decode with invalid base64
 	invalidDecoded := b64decode("this is not valid base64!!!!!")
 	assert.Nil(t, invalidDecoded, "Invalid base64 should return nil")

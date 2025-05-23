@@ -117,7 +117,7 @@ func TestErrorMessage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			code, message := ErrorMessage(tt.err)
-			
+
 			assert.Equal(t, tt.expectedCode, code)
 			assert.Equal(t, tt.expectedErrMsg, message["error_message"])
 		})
@@ -129,19 +129,19 @@ func TestPredefinedErrors(t *testing.T) {
 	// Test predefined RequestError instances
 	assert.Equal(t, "bad request", ErrInvalidParam.Error())
 	assert.Equal(t, http.StatusBadRequest, ErrInvalidParam.Code())
-	
+
 	assert.Equal(t, "internal error", ErrInternalError.Error())
 	assert.Equal(t, http.StatusInternalServerError, ErrInternalError.Code())
-	
+
 	assert.Equal(t, "request not found", ErrNotFound.Error())
 	assert.Equal(t, http.StatusNotFound, ErrNotFound.Code())
-	
+
 	assert.Equal(t, "unauthorized", ErrUnauthorized.Error())
 	assert.Equal(t, http.StatusUnauthorized, ErrUnauthorized.Code())
-	
+
 	assert.Equal(t, "forbidden", ErrForbidden.Error())
 	assert.Equal(t, http.StatusForbidden, ErrForbidden.Code())
-	
+
 	// Test a few standard errors
 	assert.Equal(t, "imageboard id required", ErrNoIb.Error())
 	assert.Equal(t, "thread id required", ErrNoThread.Error())
