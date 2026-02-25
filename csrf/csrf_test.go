@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	sessionCookie *http.Cookie
-	csrfCookie    *http.Cookie
-	sessionToken  string
+	csrfCookie   *http.Cookie
+	sessionToken string
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
@@ -43,19 +42,6 @@ func performCsrfFormRequest(r http.Handler, method, path, token string) *httptes
 	req, _ := http.NewRequest(method, path, &b)
 	req.AddCookie(csrfCookie)
 	req.Header.Set("Content-Type", mw.FormDataContentType())
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	return w
-}
-
-func performCsrfSessionCookieRequest(r http.Handler, method, path string, cookie bool) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, nil)
-
-	if cookie {
-		req.AddCookie(sessionCookie)
-	}
-
-	req.AddCookie(csrfCookie)
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	return w
@@ -121,12 +107,9 @@ func TestCsrfCookie(t *testing.T) {
 		csrfCookie = userCookie
 	}
 
-	sCookie, err := request.Cookie(SessionCookieName)
-	if assert.NoError(t, err, "An error was not expected") {
-		assert.Contains(t, sCookie.String(), SessionCookieName, "Response must include session cookie")
-		sessionToken = sCookie.Value
-		sessionCookie = sCookie
-	}
+	// The masked session token is passed to controllers via c.Set, not a cookie.
+	// Reconstruct it the same way Cookie() does: mask the csrf token and base64 encode.
+	sessionToken = b64encode(maskToken(b64decode(csrfCookie.Value)))
 
 }
 
@@ -171,29 +154,6 @@ func TestCsrfVerifyForm(t *testing.T) {
 	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
 
 	goodrequest := performCsrfFormRequest(router, "POST", "/reply", sessionToken)
-
-	assert.Equal(t, goodrequest.Code, 200, "HTTP request code should match")
-
-}
-
-func TestCsrfVerifySessionCookiePost(t *testing.T) {
-
-	gin.SetMode(gin.ReleaseMode)
-
-	router := gin.New()
-
-	// posts need to be verified
-	router.Use(Verify())
-
-	router.POST("/reply", func(c *gin.Context) {
-		c.String(200, "OK")
-	})
-
-	badrequest := performCsrfSessionCookieRequest(router, "POST", "/reply", false)
-
-	assert.Equal(t, badrequest.Code, 403, "HTTP request code should match")
-
-	goodrequest := performCsrfSessionCookieRequest(router, "POST", "/reply", true)
 
 	assert.Equal(t, goodrequest.Code, 200, "HTTP request code should match")
 
@@ -288,22 +248,11 @@ func TestCsrfMultipleCookies(t *testing.T) {
 	// Second request with cookies already set
 	req, _ := http.NewRequest("GET", "/test", nil)
 	req.AddCookie(csrfCookie)
-	req.AddCookie(sessionCookie)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code, "HTTP request code should match")
-
-	// Verify session cookie is always regenerated
-	sessionCookieFound := false
-	for _, cookie := range w.Result().Cookies() {
-		if cookie.Name == SessionCookieName {
-			sessionCookieFound = true
-			break
-		}
-	}
-	assert.True(t, sessionCookieFound, "A session cookie should always be generated")
 }
 
 // Test cookie with invalid length

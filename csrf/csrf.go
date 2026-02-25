@@ -15,8 +15,6 @@ const (
 	FormFieldName = "csrf_token"
 	// CookieName is the name of CSRF cookie
 	CookieName = "csrf_token"
-	// SessionCookieName the name of the session cookie for angularjs
-	SessionCookieName = "XSRF-TOKEN"
 )
 
 // skip these methods
@@ -27,7 +25,7 @@ var skipMethods = map[string]bool{
 	"TRACE":   true,
 }
 
-// Cookie generates two cookies: a long term csrf token for a user, and a masked session token to verify against
+// Cookie generates a long term csrf token cookie for a user, and a masked session token for controllers to inject into the page
 func Cookie() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -61,20 +59,8 @@ func Cookie() gin.HandlerFunc {
 
 		}
 
-		// generate a session token
+		// generate a masked session token and pass to controllers
 		sessionToken := b64encode(maskToken(csrfToken))
-
-		// set the users csrf token tookie
-		sessionCookie := &http.Cookie{
-			Name:  SessionCookieName,
-			Value: sessionToken,
-			Path:  "/",
-		}
-
-		// set the session cookie
-		http.SetCookie(c.Writer, sessionCookie)
-
-		// pass token to controllers
 		c.Set("csrf_token", string(sessionToken))
 
 		c.Next()
@@ -109,14 +95,6 @@ func Verify() gin.HandlerFunc {
 		// Then POST values
 		if len(sentToken) == 0 {
 			sentToken = c.PostForm(FormFieldName)
-		}
-
-		// Then the CSRF session cookie
-		if len(sentToken) == 0 {
-			sessionCookie, err := c.Request.Cookie(SessionCookieName)
-			if err == nil {
-				sentToken = sessionCookie.Value
-			}
 		}
 
 		// sentToken should never be empty at this point so abort
