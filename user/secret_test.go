@@ -227,9 +227,9 @@ func TestConcurrentSecretAccess(t *testing.T) {
 	const numGoroutines = 10
 	done := make(chan bool)
 
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		go func() {
-			for j := 0; j < 100; j++ {
+			for range 100 {
 				secret, err := GetPrimarySecret()
 				assert.NoError(t, err)
 				assert.Equal(t, "concurrent-test-secret", secret)
@@ -239,7 +239,7 @@ func TestConcurrentSecretAccess(t *testing.T) {
 	}
 
 	// Wait for all goroutines to complete
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		<-done
 	}
 

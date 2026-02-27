@@ -84,6 +84,6 @@ func (err *RequestError) Error() string {
 }
 
 // ErrorMessage returns the code and message for Gins JSON helpers
-func ErrorMessage(errorType *RequestError) (code int, message map[string]interface{}) {
-	return errorType.Code(), map[string]interface{}{"error_message": errorType.Error()}
+func ErrorMessage(errorType *RequestError) (code int, message map[string]any) {
+	return errorType.Code(), map[string]any{"error_message": errorType.Error()}
 }

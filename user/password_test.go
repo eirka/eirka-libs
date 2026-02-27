@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cmp"
 	"strings"
 	"testing"
 	"time"
@@ -9,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	// Helper function for min value
-	"golang.org/x/exp/constraints"
 
 	"github.com/eirka/eirka-libs/config"
 	"github.com/eirka/eirka-libs/db"
@@ -67,7 +67,7 @@ func TestGeneratePassword(t *testing.T) {
 	}
 
 	// Check character set compliance
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		pass := generateRandomPassword(100) // Generate a long password to increase chances of coverage
 		for _, char := range pass {
 			assert.Contains(t, letterBytes, string(char), "Password contains invalid character")
@@ -107,7 +107,7 @@ func TestGeneratePasswordZeroLength(t *testing.T) {
 }
 
 // Helper for min
-func min[T constraints.Ordered](a, b T) T {
+func min[T cmp.Ordered](a, b T) T {
 	if a < b {
 		return a
 	}
@@ -203,7 +203,7 @@ func TestRandomPasswordSecurity(t *testing.T) {
 	passwords := make(map[string]bool)
 	iterations := 100
 
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		pass, hash, err := RandomPassword()
 		assert.NoError(t, err, "RandomPassword should not error")
 		assert.NotEmpty(t, pass, "Password should not be empty")
@@ -272,7 +272,7 @@ func TestConstantTimeCompare(t *testing.T) {
 
 	// Valid comparison
 	validStart := time.Now()
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		user.ComparePassword(password)
 	}
 	validDuration := time.Since(validStart)
@@ -281,7 +281,7 @@ func TestConstantTimeCompare(t *testing.T) {
 	// Invalid comparison with same length
 	wrongPassword := "incorrectPassword1"
 	invalidStart := time.Now()
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		user.ComparePassword(wrongPassword)
 	}
 	invalidDuration := time.Since(invalidStart)
@@ -306,7 +306,7 @@ func TestSecureRandomness(t *testing.T) {
 	passwords := make(map[string]bool, passwordCount)
 
 	// Generate a large set of passwords
-	for i := 0; i < passwordCount; i++ {
+	for range passwordCount {
 		password := generateRandomPassword(passwordLength)
 		assert.Len(t, password, passwordLength, "Password should be correct length")
 
@@ -318,7 +318,7 @@ func TestSecureRandomness(t *testing.T) {
 	// Test character distribution - all character classes should be represented
 	// For crypto-secure RNG, we should see all character classes well-represented
 	alphabet := make(map[byte]int)
-	for i := 0; i < len(letterBytes); i++ {
+	for i := range len(letterBytes) {
 		alphabet[letterBytes[i]] = 0
 	}
 
@@ -330,7 +330,7 @@ func TestSecureRandomness(t *testing.T) {
 	}
 
 	// All characters should be used
-	for i := 0; i < len(letterBytes); i++ {
+	for i := range len(letterBytes) {
 		count := alphabet[letterBytes[i]]
 		assert.True(t, count > 0, "Character %c should be used at least once", letterBytes[i])
 	}

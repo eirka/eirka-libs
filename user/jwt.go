@@ -86,7 +86,7 @@ func MakeToken(uid uint) (newtoken string, err error) {
 
 // validateToken checks all the claims in the provided token and returns the appropriate secret
 // for token validation. It also updates the user object with information from the token.
-func validateToken(token *jwt.Token, user *User) (interface{}, error) {
+func validateToken(token *jwt.Token, user *User) (any, error) {
 	// check alg to make sure its hmac
 	_, ok := token.Method.(*jwt.SigningMethodHMAC)
 	if !ok {

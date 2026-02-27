@@ -854,7 +854,7 @@ func TestConcurrentPasswordChecks(t *testing.T) {
 	var wg sync.WaitGroup
 	results := make([]bool, concurrency)
 
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
@@ -870,11 +870,11 @@ func TestConcurrentPasswordChecks(t *testing.T) {
 	}
 
 	// Reset and check incorrect passwords
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		results[i] = false
 	}
 
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
@@ -896,14 +896,14 @@ func TestCheckDuplicatePerformance(t *testing.T) {
 	assert.NoError(t, err, "Creating test DB should not error")
 
 	// Set up expectations for multiple calls
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
 		mock.ExpectQuery(`select count\(\*\) from users where user_name`).WillReturnRows(rows)
 	}
 
 	// Run multiple checks concurrently
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		wg.Add(1)
 		go func(username string) {
 			defer wg.Done()

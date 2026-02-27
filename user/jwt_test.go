@@ -70,7 +70,7 @@ func TestMakeTokenValidateOutput(t *testing.T) {
 		assert.NotEmpty(t, token, "Token should not be empty")
 	}
 
-	out, err := jwt.ParseWithClaims(token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	out, err := jwt.ParseWithClaims(token, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return []byte("secret"), nil
 	})
 	if assert.NoError(t, err, "An error was not expected") {
@@ -188,7 +188,7 @@ func TestAlgorithmConfusionAttack(t *testing.T) {
 	tokenString, err := token.SignedString(jwt.UnsafeAllowNoneSignatureType)
 	if assert.NoError(t, err, "An error was not expected during token creation") {
 		// Try to parse this token
-		_, err = jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 			return validateToken(token, &user)
 		})
 		// Should get an error about invalid signing method
@@ -226,7 +226,7 @@ func TestTokenTampering(t *testing.T) {
 
 		// Try to validate the tampered token
 		user := DefaultUser()
-		_, err = jwt.ParseWithClaims(tamperedToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(tamperedToken, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 			return validateToken(token, &user)
 		})
 
@@ -253,7 +253,7 @@ func TestSensitiveDataInClaims(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Parse the token without verification to examine claims
-	token, _ := jwt.ParseWithClaims(validToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, _ := jwt.ParseWithClaims(validToken, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return []byte(primarySecret), nil
 	})
 
@@ -329,7 +329,7 @@ func TestTokenTimeSkew(t *testing.T) {
 	futureToken, err := token.SignedString([]byte(primarySecret))
 	if assert.NoError(t, err, "An error was not expected") {
 		// Try to parse this token (should fail because NotBefore is in future)
-		_, err = jwt.ParseWithClaims(futureToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(futureToken, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 			return validateToken(token, &user)
 		})
 
@@ -381,7 +381,7 @@ func TestTokenWithUnsupportedAlgorithm(t *testing.T) {
 	}
 
 	// Parse header
-	var header map[string]interface{}
+	var header map[string]any
 	if err = json.Unmarshal(headerBytes, &header); err != nil {
 		t.Fatalf("Error unmarshaling header: %v", err)
 	}
@@ -400,7 +400,7 @@ func TestTokenWithUnsupportedAlgorithm(t *testing.T) {
 	modifiedTokenString := modifiedHeader + "." + parts[1] + "." + parts[2]
 
 	// Try to validate the token with algorithm confusion
-	_, err = jwt.ParseWithClaims(modifiedTokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(modifiedTokenString, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 
@@ -482,7 +482,7 @@ func TestInvalidTokenClaims(t *testing.T) {
 			}
 
 			// Try to validate
-			_, err = jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+			_, err = jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 				return validateToken(token, &user)
 			})
 

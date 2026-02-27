@@ -50,7 +50,7 @@ func TestGeneratesAValidToken(t *testing.T) {
 }
 
 func TestVerifyTokenChecksLengthCorrectly(t *testing.T) {
-	for i := 0; i < 64; i++ {
+	for i := range 64 {
 		slice := make([]byte, i)
 		result := verifyToken(slice, slice)
 		if result != false {

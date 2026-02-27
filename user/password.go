@@ -82,7 +82,7 @@ func generateRandomPassword(n int) string {
 
 	// Map random bytes to letterBytes character set
 	letterLen := len(letterBytes)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		b[i] = letterBytes[int(b[i])%letterLen]
 	}
 

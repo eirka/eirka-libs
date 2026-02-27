@@ -200,7 +200,7 @@ func TestAuthValidateToken(t *testing.T) {
 		assert.NotEmpty(t, tkn, "Token should be returned")
 	}
 
-	out, err := jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	out, err := jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 	if assert.NoError(t, err, "An error was not expected") {
@@ -239,7 +239,7 @@ func TestAuthValidateTokenNoUser(t *testing.T) {
 		assert.NotEmpty(t, tkn, "Token should be returned")
 	}
 
-	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 	assert.Error(t, err, "An error was expected")
@@ -279,7 +279,7 @@ func TestAuthValidateTokenBadUser(t *testing.T) {
 		assert.NotEmpty(t, tkn, "Token should be returned")
 	}
 
-	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 	assert.Error(t, err, "An error was expected")
@@ -315,7 +315,7 @@ func TestAuthValidateTokenNoIssuer(t *testing.T) {
 		assert.NotEmpty(t, tkn, "Token should be returned")
 	}
 
-	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 	assert.Error(t, err, "An error was expected")
@@ -352,7 +352,7 @@ func TestAuthValidateTokenBadIssuer(t *testing.T) {
 		assert.NotEmpty(t, tkn, "Token should be returned")
 	}
 
-	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(tkn, &TokenClaims{}, func(token *jwt.Token) (any, error) {
 		return validateToken(token, &user)
 	})
 	assert.Error(t, err, "An error was expected")

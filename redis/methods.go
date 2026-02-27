@@ -15,7 +15,7 @@ type Storer interface {
 	Set(key string, result []byte) (err error)
 	SetEx(key string, timeout uint, result []byte) (err error)
 	HMSet(key string, value string, result []byte) (err error)
-	Delete(key ...interface{}) (err error)
+	Delete(key ...any) (err error)
 	Flush() (err error)
 	Incr(key string) (result int, err error)
 	Expire(key string, timeout uint) (err error)
@@ -148,7 +148,7 @@ func (c *Store) HMSet(key string, value string, result []byte) (err error) {
 }
 
 // Delete will delete a key
-func (c *Store) Delete(key ...interface{}) (err error) {
+func (c *Store) Delete(key ...any) (err error) {
 	if len(key) == 0 {
 		return errors.New("at least one key must be provided")
 	}

@@ -41,7 +41,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			}
 
 			// First try with new secret (always the first one)
-			parseFunc := func(token *jwt.Token) (interface{}, error) {
+			parseFunc := func(token *jwt.Token) (any, error) {
 				return validateToken(token, &user)
 			}
 
@@ -50,7 +50,7 @@ func Auth(authenticated bool) gin.HandlerFunc {
 			// If token validation failed and old secret is available, try with it
 			if parseErr != nil && len(secrets) > 1 {
 				// Try with old secret directly
-				secondaryFunc := func(token *jwt.Token) (interface{}, error) {
+				secondaryFunc := func(token *jwt.Token) (any, error) {
 					// Validate algorithm
 					_, ok := token.Method.(*jwt.SigningMethodHMAC)
 					if !ok {

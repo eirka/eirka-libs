@@ -100,7 +100,7 @@ func oneTimePad(data, key []byte) {
 		panic("Lengths of slices are not equal")
 	}
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		data[i] ^= key[i]
 	}
 }
