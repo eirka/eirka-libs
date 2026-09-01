@@ -32,14 +32,6 @@ To enable verbose test output:
 go test -v ./...
 ```
 
-### Redis Test Requirements
-
-Some Redis tests require a local Redis server to be installed and available in PATH:
-```bash
-# Redis tests will fail if redis-server isn't available
-go test github.com/eirka/eirka-libs/redis
-```
-
 ## Architecture
 
 The repository is organized into domain-specific packages:
@@ -103,3 +95,14 @@ Tests follow a consistent pattern:
 4. **Mocking**: The codebase extensively uses mocking for tests, particularly for database and Redis operations.
 
 5. **Secret Management**: JWT secrets are stored in the central configuration file and support rotation through a primary/secondary secret mechanism. The SecretManager ensures thread-safe access to secrets.
+
+## Test prerequisites
+
+- Only `redis/` needs a real server: `tempredis.Start` in redis/redis_test.go, mutex_test.go, keys_test.go execs `redis-server -` and panics (no skip) if it is not on PATH; `make preflight` checks this.
+- `go test -count=1 ./...` takes ~18s wall (redis ~16s, user ~18s); not hung.
+- Runs rewrite `redis/dump.rdb` (gitignored `*.rdb`).
+- Gate before PR: `make check` (build + gofmt/go vet + `go test -count=1 ./...`).
+
+## Fleet conventions
+
+Tags/releases are cut by the maintainer only, by convention (nothing in-repo enforces it) - never tag here; consumers eirka-admin, eirka-get, eirka-index, eirka-post pin an explicit version with `go get github.com/eirka/eirka-libs@vX.Y.Z` because proxy.golang.org serves a cached version list and lags fresh tags.
